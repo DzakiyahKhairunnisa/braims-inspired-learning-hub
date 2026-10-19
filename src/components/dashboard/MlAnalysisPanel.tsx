@@ -19,6 +19,13 @@ import {
   type MlRiskInsight,
 } from "@/lib/ml-engine";
 import type { Reading } from "@/lib/telemetry";
+import { ML_METHODOLOGY_SECTIONS } from "@/lib/ml-methodology-doc";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 const tip = { background: "var(--card)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12 };
 
@@ -74,6 +81,41 @@ export function MlAnalysisPanel({
           Hasil modul ini hanya masukan ke rule engine FEWS/DEWS; keputusan operasi tetap di Operator BU setelah ADAS
           valid.
         </p>
+      </Panel>
+
+      <Panel title="Penjelasan metodologi lengkap (teori vs implementasi)">
+        <p className="mb-4 text-sm text-muted-foreground">
+          Bagian ini menjawab: dari mana acuan teori, apa yang dipakai di kode, hubungannya dengan rancangan
+          Sengkaling, dan apakah bertentangan dengan persamaan desain bendungan.
+        </p>
+        <Accordion type="multiple" defaultValue={["theory", "implemented"]} className="w-full">
+          {ML_METHODOLOGY_SECTIONS.map((sec) => (
+            <AccordionItem key={sec.id} value={sec.id}>
+              <AccordionTrigger className="text-left font-semibold">{sec.title}</AccordionTrigger>
+              <AccordionContent>
+                <div className="space-y-3 pb-2 text-sm text-muted-foreground">
+                  {sec.paragraphs.map((p) => (
+                    <p key={p.slice(0, 40)}>{p}</p>
+                  ))}
+                  {sec.formulas?.map((f) => (
+                    <div key={f.expr} className="rounded-lg border border-border bg-muted/50 p-3">
+                      <p className="text-xs font-semibold text-foreground">{f.label}</p>
+                      <p className="mt-1 font-mono text-xs text-primary">{f.expr}</p>
+                      {f.note && <p className="mt-2 text-xs">{f.note}</p>}
+                    </div>
+                  ))}
+                  {sec.bullets && (
+                    <ul className="list-disc space-y-1.5 pl-5">
+                      {sec.bullets.map((b) => (
+                        <li key={b}>{b}</li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
       </Panel>
 
       <div className="grid gap-6 lg:grid-cols-2">
