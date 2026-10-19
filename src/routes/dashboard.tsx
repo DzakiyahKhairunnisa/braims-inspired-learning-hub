@@ -5,7 +5,7 @@ import {
   Waves, Download, Search, Menu, ClipboardList, GitBranch, Zap, Send,
 } from "lucide-react";
 import {
-  Area, AreaChart, CartesianGrid, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis, Legend,
+  CartesianGrid, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis, Legend,
 } from "recharts";
 import { ReservoirGauge } from "@/components/ReservoirGauge";
 import { OperatorCenter } from "@/components/dashboard/OperatorCenter";
@@ -17,7 +17,7 @@ import { OperatorRequestLists } from "@/components/dashboard/OperatorRequestList
 import { DEFAULT_DAM_CONFIG } from "@/lib/dam-config";
 import { changeSimulationScenario, fmtTime, useTelemetry } from "@/lib/telemetry";
 import { SIM_SCENARIOS } from "@/lib/simulation-scenarios";
-import { ML_DEMO_LABEL } from "@/lib/ml-engine";
+import { MlAnalysisPanel } from "@/components/dashboard/MlAnalysisPanel";
 import { statusBadgeClass } from "@/lib/rule-engine";
 import { useDamSystem, useOperatorStore } from "@/hooks/useDamSystem";
 import { assessFloatingPvOps } from "@/lib/floating-pv";
@@ -233,7 +233,7 @@ function Dashboard() {
             )}
             {tab === "fpv" && <FloatingPvPanel ops={fpvOps} level={current?.level} />}
             {tab === "sensors" && <SensorTable sensors={validation.sensors} messages={validation.messages} />}
-            {tab === "ml" && <MlPanel forecast={forecast} ml={ml} />}
+            {tab === "ml" && <MlAnalysisPanel data={data} dataOk={dataOk} forecast={forecast} ml={ml} />}
             {tab === "fews" && <FewsPanel r={current} rules={rules} forecast={forecast} dataOk={dataOk} />}
             {tab === "dews" && <DewsPanel r={current} rules={rules} storage={storage} dataOk={dataOk} />}
             {tab === "kirim" && (
@@ -385,50 +385,6 @@ function SensorTable({
         </table>
       </div>
     </Panel>
-  );
-}
-
-function MlPanel({
-  forecast,
-  ml,
-}: {
-  forecast: import("@/lib/ml-engine").ElevationForecastPoint[];
-  ml: import("@/lib/ml-engine").MlRiskInsight;
-}) {
-  return (
-    <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
-      <Panel title="Prediksi Muka Air — Waduk Sengkaling">
-        <p className="mb-3 text-xs font-semibold text-warning">{ML_DEMO_LABEL}</p>
-        <p className="mb-3 text-xs text-muted-foreground">
-          Garis referensi: FEWS +{SENGKALING_LEVELS_GUIDE.fews.z} m · NWL +{SENGKALING_LEVELS_GUIDE.nwl.z} m · LWL +{SENGKALING_LEVELS_GUIDE.lwl.z} m
-        </p>
-        <div className="h-80">
-          <ResponsiveContainer>
-            <AreaChart data={forecast}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-              <XAxis dataKey="label" fontSize={11} stroke="var(--muted-foreground)" />
-              <YAxis domain={["auto", "auto"]} fontSize={11} stroke="var(--muted-foreground)" />
-              <Tooltip contentStyle={tip} />
-              <ReferenceLine y={LEVELS.FEWS} stroke="var(--warning)" strokeDasharray="4 4" />
-              <ReferenceLine y={LEVELS.NWL} stroke="var(--success)" strokeDasharray="2 2" />
-              <ReferenceLine y={LEVELS.LWL} stroke="var(--muted-foreground)" strokeDasharray="4 4" />
-              <Area dataKey="upper" stroke="none" fill="var(--chart-1)" fillOpacity={0.12} name="Batas atas" />
-              <Area dataKey="elevation" stroke="var(--chart-1)" fill="none" strokeWidth={2} name="Prediksi (m)" />
-              <Area dataKey="lower" stroke="none" fill="var(--card)" fillOpacity={1} name="Batas bawah" />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
-      </Panel>
-      <Panel title="Faktor Risiko (baseline)">
-        <ul className="list-disc space-y-2 pl-5 text-sm text-muted-foreground">
-          {ml.factors.length ? ml.factors.map((f) => <li key={f}>{f}</li>) : <li>Tidak ada faktor dominan</li>}
-        </ul>
-        <dl className="mt-4 space-y-2 text-sm">
-          <div className="flex justify-between"><dt className="text-muted-foreground">Tren banjir</dt><dd>{ml.floodRiskTrend}</dd></div>
-          <div className="flex justify-between"><dt className="text-muted-foreground">Risiko defisit</dt><dd>{ml.droughtDeficitRisk}</dd></div>
-        </dl>
-      </Panel>
-    </div>
   );
 }
 

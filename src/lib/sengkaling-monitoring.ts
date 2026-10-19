@@ -73,7 +73,7 @@ export const SENGKALING_DATA_STACK = [
   {
     key: "ml",
     title: "Prediksi ML (baseline)",
-    detail: `Tren 1–24 jam memakai inflow/hujan; masukan FEWS (≥+${LEVELS.FEWS} m) & DEWS (≤+${LEVELS.LWL} m margin).`,
+    detail: `Baseline Z(h)=Z_t+h(0,5·m+β_P+β_Q) dari WL-01, RG-01, Q-IN/OUT; masukan rule FEWS/DEWS.`,
   },
   {
     key: "fews",
