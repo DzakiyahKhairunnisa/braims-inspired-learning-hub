@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as DamProfileRouteImport } from './routes/dam-profile'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as EarlyWarningRouteImport } from './routes/early-warning'
+import { Route as GalleryRouteImport } from './routes/gallery'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -34,18 +35,25 @@ const EarlyWarningRoute = EarlyWarningRouteImport.update({
   path: '/early-warning',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GalleryRoute = GalleryRouteImport.update({
+  id: '/gallery',
+  path: '/gallery',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dam-profile': typeof DamProfileRoute
   '/dashboard': typeof DashboardRoute
   '/early-warning': typeof EarlyWarningRoute
+  '/gallery': typeof GalleryRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dam-profile': typeof DamProfileRoute
   '/dashboard': typeof DashboardRoute
   '/early-warning': typeof EarlyWarningRoute
+  '/gallery': typeof GalleryRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -53,13 +61,20 @@ export interface FileRoutesById {
   '/dam-profile': typeof DamProfileRoute
   '/dashboard': typeof DashboardRoute
   '/early-warning': typeof EarlyWarningRoute
+  '/gallery': typeof GalleryRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dam-profile' | '/dashboard' | '/early-warning'
+  fullPaths: '/' | '/dam-profile' | '/dashboard' | '/early-warning' | '/gallery'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dam-profile' | '/dashboard' | '/early-warning'
-  id: '__root__' | '/' | '/dam-profile' | '/dashboard' | '/early-warning'
+  to: '/' | '/dam-profile' | '/dashboard' | '/early-warning' | '/gallery'
+  id:
+    | '__root__'
+    | '/'
+    | '/dam-profile'
+    | '/dashboard'
+    | '/early-warning'
+    | '/gallery'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -67,6 +82,7 @@ export interface RootRouteChildren {
   DamProfileRoute: typeof DamProfileRoute
   DashboardRoute: typeof DashboardRoute
   EarlyWarningRoute: typeof EarlyWarningRoute
+  GalleryRoute: typeof GalleryRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -99,6 +115,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EarlyWarningRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/gallery': {
+      id: '/gallery'
+      path: '/gallery'
+      fullPath: '/gallery'
+      preLoaderRoute: typeof GalleryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -107,6 +130,7 @@ const rootRouteChildren: RootRouteChildren = {
   DamProfileRoute: DamProfileRoute,
   DashboardRoute: DashboardRoute,
   EarlyWarningRoute: EarlyWarningRoute,
+  GalleryRoute: GalleryRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

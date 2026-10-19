@@ -1,24 +1,56 @@
-# Braims-Inspired Learning Hub
+# Bendungan Sengkaling — Smart Dam Intelligence
 
-https://braims.vercel.app/, buat website yg menarik kayak braims gituu, ambil data dari pdf tertera
+Dashboard **decision-support** untuk rancangan **Bendungan Sengkaling** (Desa Tengah, Kec. Utan, Kab. Sumbawa, NTB) — data teknis dari proposal LRBN SENGKALING-64: FEWS, DEWS, ADAS/IoT (simulasi), ML baseline, workflow operator, dan audit log.
 
-This project was built with [Lovable](https://lovable.dev).
+> **Penting:** Tidak ada koneksi ke aktuator bendungan nyata. Data default adalah **SIMULASI** hingga sensor/MQTT/API terhubung.
 
-## Build with Lovable
-
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/ce4651bb-d261-41c4-9ec3-ae07cf44f37d).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
-
-## Development
-
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+## Menjalankan aplikasi
 
 ```sh
-git clone <this-repository-url>
-cd <repository-name>
 npm i
+npm run generate:gallery   # gambar galeri + hero (membutuhkan sharp, terpasang via npm i)
 npm run dev
 ```
+
+Buka `http://localhost:5173` (atau port yang ditampilkan Vite).
+
+## Halaman utama
+
+| Rute | Fungsi |
+|------|--------|
+| `/` | Landing & pratinjau status simulasi |
+| `/dam-profile` | Profil teknis rencana |
+| `/early-warning` | Konsep FEWS & DEWS |
+| `/gallery` | Galeri 15 ilustrasi rancangan (JPG) |
+| `/dashboard` | Pusat operasi (FEWS/DEWS, sensor, ML, operator, histori) |
+
+## Uji skenario FEWS/DEWS
+
+Di **Dashboard → Konfigurasi**, pilih skenario simulasi (normal, banjir, kekeringan, sensor terputus, anomali struktur, dll.).
+
+Jalankan tes otomatis:
+
+```sh
+npm test
+```
+
+File `src/test/rule-engine-scenarios.test.ts` mencakup 10 skenario operasi wajib.
+
+## Konfigurasi ambang operasi
+
+Edit `src/lib/dam-config.ts` setelah validasi SOP:
+
+- LWL +101 m, FEWS evaluasi +113 m, NWL +119 m, HWL +123 m (dari proposal desain)
+- Margin dH/dt dan jarak ke NWL/LWL dapat disesuaikan
+
+## Integrasi nyata (nanti)
+
+| Lapisan | File |
+|---------|------|
+| Telemetri IoT/API | `src/lib/telemetry.ts` — ganti `simulatedSource` |
+| ML terlatih | `src/lib/ml-engine.ts` — ganti baseline |
+| Notifikasi eksternal | konfigurasi terpisah (email/SMS) — belum diaktifkan |
+
+## Tim
+
+SENGKALING-64 · Universitas Brawijaya · LRBN 2026

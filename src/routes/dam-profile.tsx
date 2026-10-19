@@ -3,7 +3,18 @@ import { AlertTriangle } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { SiteHeader, SiteFooter } from "@/components/SiteHeader";
 import { ReservoirGauge } from "@/components/ReservoirGauge";
-import { BENEFITS, FLOODS, LEVELS, STORAGE, TEAM } from "@/lib/dam-data";
+import {
+  BENEFITS,
+  DAM_GEOMETRY,
+  FLOODS,
+  INTAKE,
+  LEVELS,
+  LOCATION,
+  RESERVOIR,
+  SPILLWAY,
+  STORAGE,
+  TEAM,
+} from "@/lib/dam-data";
 
 export const Route = createFileRoute("/dam-profile")({
   head: () => ({
@@ -27,12 +38,21 @@ const levelRows = [
 ];
 
 const components = [
-  { t: "Tubuh Bendungan Utama", d: "Bendungan urugan dengan zona inti, transisi, dan kaki hilir; elevasi puncak +127,05 m." },
-  { t: "Waduk", d: "Luas permukaan ±6,24 km²; tampungan mati 5,15 juta m³ dan efektif 12,60 juta m³." },
-  { t: "Spillway Utama", d: "Mercu ogee untuk melewatkan banjir rencana Q1000 dan QPMF." },
-  { t: "Spillway Maintenance", d: "Jalur alternatif saat spillway utama diinspeksi atau dipelihara." },
-  { t: "Low-level Outlet", d: "Pelepasan bertahap saat FEWS aktif untuk menyediakan flood cushion." },
-  { t: "Terowongan Pengelak", d: "Pengalihan aliran selama konstruksi, ditutup stoplog setelah selesai." },
+  {
+    t: "Tubuh Bendungan Utama",
+    d: `Bendungan urugan zona (inti, filter, rockfill); tinggi ${DAM_GEOMETRY.heightM} m, lebar puncak ${DAM_GEOMETRY.crestWidthM} m, dasar lembah +${DAM_GEOMETRY.valleyFloorM} m, puncak +${DAM_GEOMETRY.crestElevationM} m.`,
+  },
+  {
+    t: "Waduk",
+    d: `Luas permukaan ${RESERVOIR.surfaceAreaHa} ha; tampungan mati 5,15 jt m³, efektif 12,60 jt m³, maksimum 27,46 jt m³.`,
+  },
+  {
+    t: "Spillway Utama",
+    d: `${SPILLWAY.type}, ${SPILLWAY.weirType}, mercu +${SPILLWAY.crestElevationM} m, tinggi ${SPILLWAY.weirHeightM} m, lebar ${SPILLWAY.weirWidthM} m, saluran samping ${SPILLWAY.channelLengthM} m.`,
+  },
+  { t: "Bangunan Intake / PLTA", d: `${INTAKE.type} el. +${INTAKE.elevationM} m, Q ${INTAKE.designDischargeM3s} m³/det, daya ±${INTAKE.powerMw} MW.` },
+  { t: "Low-level Outlet", d: "Pelepasan bertahap saat FEWS aktif untuk menyediakan flood cushion (+113 m → +123 m)." },
+  { t: "Terowongan Pengelak", d: "Terowongan lingkaran Ø7 m, panjang 700 m; pengalihan aliran konstruksi." },
 ];
 
 function DamProfile() {
@@ -44,8 +64,30 @@ function DamProfile() {
           <p className="text-xs uppercase tracking-[0.2em] opacity-70">AS Dam · Technical Profile</p>
           <h1 className="mt-3 text-4xl font-bold md:text-6xl">Profil Bendungan Sengkaling</h1>
           <p className="mt-4 max-w-2xl opacity-80">
-            Bendungan multifungsi berbasis BIM dan ADAS untuk mendukung pola operasi berbasis sistem peringatan dini. Dirancang oleh {TEAM.name}, {TEAM.university}.
+            Rancangan bendungan multifungsi berbasis BIM dan ADAS — {LOCATION.label}. Tim {TEAM.name}, {TEAM.university} ({TEAM.competition}).
           </p>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 py-12 md:px-8">
+        <h2 className="text-2xl font-bold">Lokasi Perencanaan</h2>
+        <p className="mt-2 text-muted-foreground">{LOCATION.label}</p>
+        <div className="mt-4 overflow-hidden rounded-xl border border-border">
+          <table className="w-full text-sm">
+            <thead className="bg-muted text-left text-muted-foreground">
+              <tr><th className="p-3">Titik AS</th><th className="p-3">East (m)</th><th className="p-3">North (m)</th><th className="p-3">Elevasi (m)</th></tr>
+            </thead>
+            <tbody>
+              {LOCATION.alignment.map((a) => (
+                <tr key={a.point} className="border-t border-border font-mono">
+                  <td className="p-3">{a.point}</td>
+                  <td className="p-3">{a.e.toFixed(3)}</td>
+                  <td className="p-3">{a.n.toFixed(3)}</td>
+                  <td className="p-3">{a.elevation.toFixed(3)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </section>
 

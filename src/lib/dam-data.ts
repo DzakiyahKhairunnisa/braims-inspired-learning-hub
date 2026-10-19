@@ -1,4 +1,4 @@
-// Design values from the SENGKALING-64 proposal (LRBN 2026). Planned design data, not measurements.
+// Design values from proposal LRBN SENGKALING-64 (Universitas Brawijaya). Planned design data, not field measurements.
 export const LEVELS = {
   LWL: 101,
   FEWS: 113,
@@ -12,17 +12,63 @@ export const STORAGE = {
   dead: 5_150_000,
   nwl: 17_750_000,
   hwl: 21_197_404,
-  effectiveMin: 6_740_000,
   effectiveReported: 12_600_000,
   maxReported: 27_460_000,
 };
 
+/** Lokasi perencanaan — proposal LRBN SENGKALING-64. */
+export const LOCATION = {
+  village: "Desa Tengah",
+  district: "Kecamatan Utan",
+  regency: "Kabupaten Sumbawa",
+  province: "Nusa Tenggara Barat",
+  label: "Desa Tengah, Kecamatan Utan, Kabupaten Sumbawa, NTB",
+  alignment: [
+    { point: 1, e: 513_459.216, n: 9_065_401.048, elevation: 130 },
+    { point: 2, e: 514_243.902, n: 9_065_445.665, elevation: 130 },
+  ],
+} as const;
+
+export const DAM_GEOMETRY = {
+  crestWidthM: 10.86,
+  heightM: 57.05,
+  freeboardM: 3.5,
+  valleyFloorM: 70,
+  crestElevationM: LEVELS.CREST,
+} as const;
+
+export const RESERVOIR = {
+  surfaceAreaHa: 624.02,
+  fpvAreaHa: 46.8,
+  fpvSharePercent: 7.5,
+} as const;
+
+export const SPILLWAY = {
+  type: "Pelimpah samping",
+  weirType: "Mercu Ogee Tipe 1",
+  crestElevationM: 125.5,
+  weirHeightM: 15,
+  weirWidthM: 10,
+  channelLengthM: 700,
+  channelWidthM: 10,
+} as const;
+
+export const INTAKE = {
+  type: "Menara intake",
+  elevationM: 95,
+  designDischargeM3s: 3.4,
+  inletWidthM: 4,
+  powerhouseElevationM: 45,
+  headM: 50,
+  powerMw: 1.42,
+} as const;
+
 export const BENEFITS = [
   { key: "irrigation", label: "Irigasi", value: "3.500 ha", note: "Kebutuhan maks. 2,5 m³/det" },
-  { key: "rawWater", label: "Air Baku / Minum", value: "≥ 76 L/det", note: "±35.000 jiwa terlayani" },
-  { key: "hydro", label: "PLTA", value: "1,40 MW", note: "Energi listrik terbarukan" },
-  { key: "flood", label: "Pengendalian Banjir", value: "Q1000 & QPMF", note: "Flood cushion +113 → +123 m" },
-  { key: "fpv", label: "Floating Solar PV", value: "44,93 MWp", note: "Konsep · 7,5% luas waduk (46,8 ha)" },
+  { key: "rawWater", label: "Air Baku / Minum", value: "76 L/det", note: "±35.000 jiwa terlayani" },
+  { key: "hydro", label: "PLTA", value: "±1,42 MW", note: "Debit rencana intake 3,40 m³/det" },
+  { key: "flood", label: "Pengendalian Banjir", value: "Q1000 & QPMF", note: "Reduksi debit puncak PMF 11,76%" },
+  { key: "fpv", label: "Floating Solar PV", value: "44,93 MWp", note: `7,5% luas waduk (${RESERVOIR.fpvAreaHa} ha)` },
   { key: "tourism", label: "Pariwisata & Perikanan", value: "Siteplan", note: "Kawasan wisata & budidaya ikan" },
 ];
 
@@ -43,11 +89,19 @@ export const FLOODS = [
 export const TEAM = {
   name: "SENGKALING-64",
   university: "Universitas Brawijaya",
-  members: ["Dzakiyah Khairunnisa (Ketua)", "Muhammad Rasya Putra", "Karol Ignasio Harunara Leton"],
-  advisor: "Ir. Anggara Wiyono Wit Saputra, ST., M.Tech., IPM., ASEAN Eng., Ph.D.",
+  competition: "Lomba Rancang Bendungan Nasional X",
+  members: [
+    "Dzakiyah Khairunnisa (Ketua)",
+    "Muhammad Rasya Putra",
+    "Karol Ignasio Harunara Leton",
+  ],
+  advisors: [
+    "Ir. Anggara Wiyono Wit Saputra, S.T., M.Tech., Ph.D., IPM., ASEAN Eng.",
+    "Prof. Dr. Ir. Pitojo Tri Juwono, M.T., IPU., ASEAN Eng.",
+  ],
 };
 
-// Linear interpolation over the reservoir-level table (Tabel 3.1). Approximate.
+// Linear interpolation over the reservoir-level table (proposal). Approximate between LWL, NWL, HWL.
 const CURVE: [number, number][] = [
   [LEVELS.LWL, STORAGE.dead],
   [LEVELS.NWL, STORAGE.nwl],

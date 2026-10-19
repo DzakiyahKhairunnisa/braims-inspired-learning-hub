@@ -5,6 +5,7 @@ const links = [
   { to: "/", label: "Beranda" },
   { to: "/dam-profile", label: "Profil Bendungan" },
   { to: "/early-warning", label: "Early Warning" },
+  { to: "/gallery", label: "Galeri Rancangan" },
 ] as const;
 
 export function SiteHeader() {

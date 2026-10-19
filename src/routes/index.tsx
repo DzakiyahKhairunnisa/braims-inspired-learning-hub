@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Cpu, Database, Radio, Activity, BrainCircuit, Siren, UserCheck, Gauge } from "lucide-react";
 import hero from "@/assets/dam-hero.jpg";
 import { SiteHeader, SiteFooter } from "@/components/SiteHeader";
-import { BENEFITS, LEVELS, STORAGE, TEAM } from "@/lib/dam-data";
+import { BENEFITS, LEVELS, LOCATION, STORAGE, TEAM } from "@/lib/dam-data";
 import { useTelemetry } from "@/lib/telemetry";
 
 export const Route = createFileRoute("/")({
@@ -50,7 +50,7 @@ function Index() {
             Bendungan Sengkaling — Smart Multipurpose Dam
           </h1>
           <p className="mt-5 max-w-2xl text-base opacity-85 md:text-lg">
-            Operasi waduk adaptif berbasis data: BIM, ADAS, IoT, dan Machine Learning memprediksi muka air dan merespons sebelum kondisi kritis.
+            Rancangan bendungan multifungsi — {LOCATION.label}. Operasi waduk adaptif berbasis BIM, ADAS, IoT, dan Machine Learning.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link to="/dashboard" className="inline-flex items-center gap-2 rounded-lg bg-accent px-5 py-3 font-medium text-accent-foreground transition hover:opacity-90">
@@ -61,6 +61,9 @@ function Index() {
             </Link>
             <Link to="/early-warning" className="rounded-lg border border-navy-foreground/30 bg-navy/30 px-5 py-3 font-medium backdrop-blur transition hover:bg-navy/50">
               View Early Warning Systems
+            </Link>
+            <Link to="/gallery" className="rounded-lg border border-navy-foreground/30 bg-navy/30 px-5 py-3 font-medium backdrop-blur transition hover:bg-navy/50">
+              Galeri Rancangan
             </Link>
           </div>
           <div className="mt-16 grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-navy-foreground/15 bg-navy-foreground/15 md:grid-cols-4">
