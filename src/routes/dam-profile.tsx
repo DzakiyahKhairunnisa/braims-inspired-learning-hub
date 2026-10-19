@@ -1,8 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { AlertTriangle } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { SiteHeader, SiteFooter } from "@/components/SiteHeader";
-import { ReservoirGauge } from "@/components/ReservoirGauge";
 import {
   BENEFITS,
   DAM_GEOMETRY,
@@ -16,15 +14,13 @@ import {
   TEAM,
 } from "@/lib/dam-data";
 import { FLOATING_PV } from "@/lib/floating-pv";
-import { Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/dam-profile")({
   head: () => ({
     meta: [
       { title: "Profil Teknis Bendungan Sengkaling" },
-      { name: "description", content: "Data teknis rencana Bendungan Sengkaling: elevasi muka air, tampungan, debit banjir rancangan, pelimpah, dan BIM." },
+      { name: "description", content: "Data teknis rencana Bendungan Sengkaling: elevasi muka air, tampungan, debit banjir rancangan, dan pelimpah." },
       { property: "og:title", content: "Profil Teknis Bendungan Sengkaling" },
-      { property: "og:description", content: "Elevasi, tampungan, debit banjir, dan komponen struktur Bendungan Sengkaling." },
     ],
   }),
   component: DamProfile,
@@ -35,6 +31,7 @@ const levelRows = [
   { k: "FEWS Level", z: LEVELS.FEWS, v: "— (trigger operasi)" },
   { k: "NWL", z: LEVELS.NWL, v: "17.750.000 m³" },
   { k: "HWL / FWL", z: LEVELS.HWL, v: "21.197.404 m³" },
+  { k: "Tampungan maksimum", z: "—", v: `${(STORAGE.max / 1e6).toFixed(2)} jt m³` },
   { k: "Muka banjir QPMF", z: LEVELS.QPMF_FLOOD, v: "—" },
   { k: "Puncak bendungan", z: LEVELS.CREST, v: "Tinggi jagaan 3,5 m" },
 ];
@@ -66,14 +63,23 @@ function DamProfile() {
           <p className="text-xs uppercase tracking-[0.2em] opacity-70">AS Dam · Technical Profile</p>
           <h1 className="mt-3 text-4xl font-bold md:text-6xl">Profil Bendungan Sengkaling</h1>
           <p className="mt-4 max-w-2xl opacity-80">
-            Rancangan bendungan multifungsi berbasis BIM dan ADAS — {LOCATION.label}. Tim {TEAM.name}, {TEAM.university} ({TEAM.competition}).
+            Rancangan bendungan multifungsi — {LOCATION.label}. Tim {TEAM.name}, {TEAM.university} ({TEAM.competition}).
           </p>
         </div>
       </section>
 
       <section className="mx-auto max-w-7xl px-4 py-12 md:px-8">
         <h2 className="text-2xl font-bold">Lokasi Perencanaan</h2>
-        <p className="mt-2 text-muted-foreground">{LOCATION.label}</p>
+        <p className="mt-4 overflow-hidden rounded-xl border border-border">
+          <img
+            src="/gallery/lokasi-as-bendungan.jpg"
+            alt=""
+            width={1280}
+            height={800}
+            className="w-full object-cover"
+          />
+        </p>
+        <p className="mt-4 text-muted-foreground">{LOCATION.label}</p>
         <div className="mt-4 overflow-hidden rounded-xl border border-border">
           <table className="w-full text-sm">
             <thead className="bg-muted text-left text-muted-foreground">
@@ -93,6 +99,17 @@ function DamProfile() {
         </div>
       </section>
 
+      <section className="mx-auto max-w-7xl px-4 py-8 md:px-8">
+        <h2 className="text-2xl font-bold">Penampang Melintang</h2>
+        <img
+          src="/gallery/penampang-melintang-bendungan.jpg"
+          alt=""
+          width={1280}
+          height={800}
+          className="mt-4 w-full rounded-xl border border-border object-cover"
+        />
+      </section>
+
       <section className="mx-auto grid max-w-7xl gap-8 px-4 py-16 md:px-8 lg:grid-cols-[1.2fr_1fr]">
         <div>
           <h2 className="text-2xl font-bold">Elevasi & Tampungan Waduk</h2>
@@ -105,24 +122,23 @@ function DamProfile() {
                 {levelRows.map((r) => (
                   <tr key={r.k} className="border-t border-border">
                     <td className="p-3 font-medium">{r.k}</td>
-                    <td className="p-3 font-mono">+{r.z} m</td>
+                    <td className="p-3 font-mono">{typeof r.z === "number" ? `+${r.z} m` : r.z}</td>
                     <td className="p-3 font-mono text-muted-foreground">{r.v}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-          <div className="mt-4 flex gap-3 rounded-xl border border-warning/50 bg-warning/10 p-4 text-sm">
-            <AlertTriangle className="size-5 shrink-0 text-warning" />
-            <p>
-              <b>Catatan perbedaan data:</b> tabel elevasi mencatat volume HWL {STORAGE.hwl.toLocaleString("id-ID")} m³, sedangkan bagian lain proposal menyebut tampungan maksimum {STORAGE.maxReported.toLocaleString("id-ID")} m³. Kedua nilai ditampilkan terpisah dan dapat diatur di Settings dashboard.
-            </p>
-          </div>
         </div>
         <div>
           <h2 className="text-2xl font-bold">Penampang Muka Air</h2>
-          <div className="mt-6"><ReservoirGauge /></div>
-          <p className="mt-3 text-xs text-muted-foreground">Elevasi +113 m adalah trigger pengendalian banjir, bukan batas keselamatan bendungan.</p>
+          <img
+            src="/gallery/level-muka-air.jpg"
+            alt=""
+            width={1280}
+            height={800}
+            className="mt-6 w-full rounded-xl border border-border object-contain bg-white"
+          />
         </div>
       </section>
 
@@ -160,9 +176,6 @@ function DamProfile() {
       <section className="border-y border-border bg-gradient-to-br from-amber-500/10 via-background to-sky-500/10">
         <div className="mx-auto max-w-7xl px-4 py-16 md:px-8">
           <h2 className="text-2xl font-bold">PLTS Terapung (Floating Solar PV)</h2>
-          <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-            Pemanfaatan energi terbarukan di permukaan waduk sesuai rancangan — terintegrasi dengan operasi bendungan dan dipantau dari dashboard.
-          </p>
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {[
               ["Kapasitas terpasang", `${FLOATING_PV.capacityMwP} MWp`],
@@ -176,22 +189,15 @@ function DamProfile() {
               </div>
             ))}
           </div>
-          <p className="mt-6 text-sm text-muted-foreground">
-            PLTA rancangan ±{FLOATING_PV.hydroMw} MW melengkapi skema energi hibrida. Status operasi FPV mengikuti kondisi muka air dan peringatan FEWS/DEWS di pusat kontrol.
-          </p>
-          <Link to="/dashboard" className="mt-4 inline-block text-sm font-medium text-primary hover:underline">
-            Lihat panel Floating PV di dashboard operasi →
+          <Link to="/dashboard" className="mt-6 inline-block text-sm font-medium text-primary hover:underline">
+            Panel Floating PV di dashboard →
           </Link>
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-8 px-4 pb-16 md:px-8 lg:grid-cols-2">
-        <div className="rounded-xl border border-dashed border-border bg-muted/30 grid-lines p-10 text-center">
-          <p className="font-display text-xl font-semibold">BIM Model · Digital Twin</p>
-          <p className="mt-2 text-sm text-muted-foreground">Placeholder untuk model 3D/BIM, gambar teknik, dan potongan melintang. Unggah model untuk ditampilkan di sini.</p>
-        </div>
+      <section className="mx-auto max-w-7xl px-4 pb-16 md:px-8">
         <div className="rounded-xl border border-border bg-card p-6">
-          <h3 className="text-lg font-semibold">Manfaat & Batasan Operasi</h3>
+          <h3 className="text-lg font-semibold">Manfaat Bendungan</h3>
           <ul className="mt-4 space-y-2 text-sm">
             {BENEFITS.map((b) => (
               <li key={b.key} className="flex justify-between gap-4 border-b border-border pb-2">
@@ -199,7 +205,7 @@ function DamProfile() {
               </li>
             ))}
           </ul>
-          <p className="mt-4 text-xs text-muted-foreground">Sumber: Proposal LRBN 2026 SENGKALING-64. Semua nilai adalah nilai rencana desain, bukan hasil pengukuran operasional.</p>
+          <p className="mt-4 text-xs text-muted-foreground">Sumber: Proposal LRBN SENGKALING-64. Nilai rencana desain.</p>
         </div>
       </section>
       <SiteFooter />

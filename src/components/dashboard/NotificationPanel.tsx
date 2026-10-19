@@ -1,6 +1,7 @@
 import { Bell } from "lucide-react";
 import { markNotificationsRead, type DashboardNotification } from "@/lib/operator-workflow";
 import { fmtDateTime } from "@/lib/telemetry";
+import { OperatorRequestLists } from "@/components/dashboard/OperatorRequestLists";
 
 export function NotificationBell({
   notifications,
@@ -24,7 +25,7 @@ export function NotificationBell({
         )}
       </button>
       {open && (
-        <div className="absolute right-0 top-full z-50 mt-2 w-[min(100vw-2rem,24rem)] rounded-xl border border-border bg-card p-3 shadow-lg">
+        <div className="absolute right-0 top-full z-50 mt-2 w-[min(100vw-2rem,28rem)] rounded-xl border border-border bg-white p-3 shadow-xl">
           <div className="mb-2 flex items-center justify-between">
             <p className="text-sm font-semibold">Notifikasi Operator</p>
             <button type="button" className="text-xs text-primary" onClick={() => markNotificationsRead()}>
@@ -37,9 +38,17 @@ export function NotificationBell({
                 <p className="font-semibold">{n.title}</p>
                 <p className="mt-1 text-muted-foreground">{fmtDateTime(n.at)} · {n.status}</p>
                 <p className="mt-2">{n.body}</p>
-                <p className="mt-2 text-muted-foreground">Rekomendasi: {n.recommendation}</p>
-                <p className="mt-1 text-[10px] text-primary">Penerima: {n.recipient}</p>
-                <p className="mt-1 font-mono text-[10px]">{n.parameters}</p>
+                <p className="mt-1 text-[10px] font-semibold text-primary">→ {n.recipient}</p>
+                {(n.pantau?.length || n.sesuaikan?.length) ? (
+                  <div className="mt-2">
+                    <OperatorRequestLists
+                      compact
+                      payload={{ ringkasan: "", pantau: n.pantau ?? [], sesuaikan: n.sesuaikan ?? [] }}
+                    />
+                  </div>
+                ) : (
+                  <p className="mt-2 text-muted-foreground">{n.recommendation}</p>
+                )}
               </li>
             ))}
             {!notifications.length && <li className="py-4 text-center text-muted-foreground">Tidak ada notifikasi.</li>}

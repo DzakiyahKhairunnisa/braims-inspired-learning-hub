@@ -18,13 +18,13 @@ export const Route = createFileRoute("/")({
 });
 
 const arch = [
-  { icon: Radio, label: "Sensors" },
+  { icon: Radio, label: "Sensor BSK-SBW" },
   { icon: Database, label: "ADAS" },
-  { icon: Cpu, label: "IoT" },
-  { icon: Database, label: "Data Center" },
-  { icon: BrainCircuit, label: "Machine Learning" },
-  { icon: Siren, label: "FEWS / DEWS / RTD" },
-  { icon: UserCheck, label: "Operator" },
+  { icon: Cpu, label: "IoT Tele-O" },
+  { icon: Database, label: "Basis Data" },
+  { icon: BrainCircuit, label: "ML (baseline)" },
+  { icon: Siren, label: "FEWS / DEWS" },
+  { icon: UserCheck, label: "Operator BU" },
 ];
 
 const stats = [
@@ -50,7 +50,7 @@ function Index() {
             Bendungan Sengkaling — Smart Multipurpose Dam
           </h1>
           <p className="mt-5 max-w-2xl text-base opacity-85 md:text-lg">
-            Rancangan bendungan multifungsi — {LOCATION.label}. Operasi waduk adaptif berbasis BIM, ADAS, IoT, dan Machine Learning.
+            Rancangan bendungan multifungsi — {LOCATION.label}. Rantai ADAS → IoT → prediksi ML → FEWS/DEWS → Operator BU & WTC BWS NTB I (simulasi).
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link to="/dashboard" className="inline-flex items-center gap-2 rounded-lg bg-accent px-5 py-3 font-medium text-accent-foreground transition hover:opacity-90">
@@ -134,7 +134,7 @@ function Index() {
             </div>
           ))}
         </div>
-        <p className="mt-4 text-xs text-muted-foreground">Kapasitas tampungan HWL acuan: {(STORAGE.hwl / 1e6).toFixed(2)} juta m³.</p>
+        <p className="mt-4 text-xs text-muted-foreground">Tampungan maksimum rancangan: {(STORAGE.max / 1e6).toFixed(2)} jt m³.</p>
       </section>
       <SiteFooter />
     </div>

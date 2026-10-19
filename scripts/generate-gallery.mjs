@@ -48,6 +48,33 @@ const titles = [
 
 await mkdir(outDir, { recursive: true });
 
+async function writePlaceholder(filename, title, c1, c2) {
+  const svg = `
+<svg width="1280" height="800" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="${c1}"/>
+      <stop offset="100%" stop-color="${c2}"/>
+    </linearGradient>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#g)"/>
+  <text x="64" y="120" fill="white" font-family="Arial,sans-serif" font-size="36" font-weight="bold">Placeholder — ganti dengan gambar Anda</text>
+  <text x="64" y="180" fill="white" font-family="Arial,sans-serif" font-size="26">${title}</text>
+  <text x="64" y="720" fill="white" font-family="Arial,sans-serif" font-size="18" opacity="0.8">public/gallery/${filename}</text>
+</svg>`;
+  await writeFile(join(outDir, filename), await sharp(Buffer.from(svg)).jpeg({ quality: 88 }).toBuffer());
+  console.log("Wrote", filename);
+}
+
+const technical = [
+  ["lokasi-as-bendungan.jpg", "Lokasi AS Bendungan", "#14532d", "#4ade80"],
+  ["penampang-melintang-bendungan.jpg", "Penampang Melintang Bendungan", "#1e3a5f", "#60a5fa"],
+  ["level-muka-air.jpg", "Level Muka Air", "#0c4a6e", "#38bdf8"],
+];
+for (const [file, title, c1, c2] of technical) {
+  await writePlaceholder(file, title, c1, c2);
+}
+
 for (let i = 0; i < 15; i++) {
   const [c1, c2] = palette[i];
   const title = titles[i];

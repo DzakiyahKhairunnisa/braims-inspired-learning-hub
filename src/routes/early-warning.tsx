@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { CloudRain, Sun, Waves, ShieldAlert } from "lucide-react";
 import { SiteHeader, SiteFooter } from "@/components/SiteHeader";
+import { LEVELS } from "@/lib/dam-data";
+import { SENGKALING_ASSET } from "@/lib/sengkaling-monitoring";
 
 export const Route = createFileRoute("/early-warning")({
   head: () => ({
@@ -29,7 +31,7 @@ function EarlyWarning() {
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">Early Warning</p>
         <h1 className="mt-2 text-4xl font-bold md:text-5xl">FEWS & DEWS</h1>
         <p className="mt-4 max-w-2xl text-muted-foreground">
-          Sistem tidak menunggu muka air mencapai pelimpah. Elevasi pemicu dan prediksi real-time digunakan untuk merespons lebih awal.
+          {SENGKALING_ASSET.name} ({SENGKALING_ASSET.location}): FEWS aktif dari elevasi +{LEVELS.FEWS} m dengan ruang tampungan hingga HWL +{LEVELS.HWL} m; DEWS mengawasi penurunan menuju LWL +{LEVELS.LWL} m.
         </p>
         <div className="mt-12 grid gap-4 md:grid-cols-4">
           {flow.map((f, i) => (
@@ -43,15 +45,15 @@ function EarlyWarning() {
           ))}
         </div>
         <div className="mt-12 rounded-xl border border-border bg-card p-8">
-          <h2 className="text-xl font-bold">Bagaimana data sampai ke Operator Utama?</h2>
+          <h2 className="text-xl font-bold">Alur data BSK-SBW → Operator BU</h2>
           <ol className="mt-4 grid gap-3 text-sm text-muted-foreground md:grid-cols-2">
             {[
-              "Sensor lapangan (muka air, hujan, debit, keamanan struktur) mengirim pembacaan ke ADAS.",
-              "ADAS memvalidasi kelengkapan dan kewajaran data; sensor bermasalah ditandai.",
-              "Gateway IoT menyalurkan data ke basis data terpusat.",
-              "Modul prediksi membantu memperkirakan tren muka air (demo di dashboard).",
-              "FEWS dan DEWS menilai risiko banjir/kekeringan dan menyusun rekomendasi.",
-              "Notifikasi masuk ke Operator Utama; keputusan disetujui/ditolak dan tercatat — tanpa kendali pintu otomatis.",
+              "Sensor WL-01, RG-01, Q-IN/OUT-01, PZ-03, SP-01, SPW-01 di lokasi bendungan Sengkaling.",
+              "ADAS memvalidasi rentang elevasi rancangan (+101–+127 m); WL-01 wajib valid untuk FEWS/DEWS otomatis.",
+              "Gateway IoT GW-01 (Tele-O) mengirim deret waktu ke basis data pusat.",
+              "Modul ML baseline memproyeksikan tren 1–24 jam (masukan rule engine).",
+              "FEWS/DEWS menghitung status WASPADA–SIAGA–KRITIS sesuai ambang LRBN SENGKALING-64.",
+              `Notifikasi & workflow ke ${SENGKALING_ASSET.operatorBu}; instruksi real-time dari WTC — tanpa kendali pintu otomatis.`,
             ].map((s, i) => (
               <li key={s} className="flex gap-3 rounded-lg bg-muted/50 p-3">
                 <span className="font-mono text-xs text-primary">{i + 1}</span>
@@ -63,7 +65,7 @@ function EarlyWarning() {
         <div className="mt-8 rounded-xl bg-water p-8 text-navy-foreground">
           <p className="font-mono text-sm opacity-80">DEWS → Konservasi Air → NWL → FEWS → Pelepasan terkendali → Spillway</p>
           <p className="mt-3 max-w-3xl text-sm opacity-80">
-            Ruang tampungan antara +113 m dan +123 m menjadi flood cushion. Operator Utama memiliki kendali penuh atas tindakan lapangan.
+            Ruang tampungan antara +113 m dan +123 m menjadi flood cushion. Operator BU Sengkaling mengendalikan lapangan; WTC BWS NTB I mengirim instruksi operasi real-time.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <Link to="/dashboard" className="inline-block rounded-lg bg-accent px-5 py-3 font-medium text-accent-foreground">Buka Dashboard</Link>

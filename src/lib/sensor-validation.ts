@@ -1,11 +1,13 @@
 import type { Reading } from "./telemetry";
 import { LEVELS } from "./dam-data";
+import { sensorMeta } from "./sengkaling-monitoring";
 
 export type SensorQuality = "Valid" | "Missing" | "Outlier" | "Stale" | "RangeError";
 
 export interface SensorRecord {
   id: string;
   type: string;
+  location: string;
   unit: string;
   online: boolean;
   quality: SensorQuality;
@@ -40,15 +42,24 @@ export function validateSensors(
     r.level <= LEVEL_MAX &&
     Number.isFinite(r.level);
 
-  if (wlOffline) messages.push("Sensor muka air (WL-01) tidak tersedia — DATA TIDAK VALID untuk keputusan otomatis.");
+  if (wlOffline) {
+    messages.push(
+      "Sensor muka air WL-01 (menara AWLR waduk Sengkaling) tidak tersedia — DATA TIDAK VALID untuk FEWS/DEWS otomatis.",
+    );
+  }
   if (r && !wlOffline && (r.level < LEVEL_MIN || r.level > LEVEL_MAX)) {
     messages.push("Nilai muka air di luar rentang operasi yang diharapkan.");
   }
 
+  const meta = (id: string, fallbackType: string) => {
+    const m = sensorMeta(id);
+    return { type: m?.type ?? fallbackType, location: m?.location ?? "BSK-SBW" };
+  };
+
   const sensors: SensorRecord[] = [
     {
       id: "WL-01",
-      type: "Elevasi Muka Air (Radar)",
+      ...meta("WL-01", "Elevasi muka air"),
       unit: "m",
       online: !wlOffline && !!r,
       quality: wlOffline ? "Missing" : levelOk ? "Valid" : "RangeError",
@@ -58,7 +69,7 @@ export function validateSensors(
     },
     {
       id: "Q-IN-01",
-      type: "Debit Masuk",
+      ...meta("Q-IN-01", "Debit masuk"),
       unit: "m³/s",
       online: !!r,
       quality: r && r.qin >= 0 ? "Valid" : "Missing",
@@ -67,7 +78,7 @@ export function validateSensors(
     },
     {
       id: "Q-OUT-01",
-      type: "Debit Keluar / Outlet",
+      ...meta("Q-OUT-01", "Debit keluar"),
       unit: "m³/s",
       online: !!r,
       quality: r && r.qout >= 0 ? "Valid" : "Missing",
@@ -76,7 +87,7 @@ export function validateSensors(
     },
     {
       id: "RG-01",
-      type: "Curah Hujan",
+      ...meta("RG-01", "Curah hujan"),
       unit: "mm",
       online: !!r,
       quality: r ? "Valid" : "Missing",
@@ -85,7 +96,7 @@ export function validateSensors(
     },
     {
       id: "GT-01",
-      type: "Posisi Bukaan Pintu",
+      ...meta("GT-01", "Bukaan pintu"),
       unit: "%",
       online: !!r,
       quality: r ? "Valid" : "Missing",
@@ -94,7 +105,7 @@ export function validateSensors(
     },
     {
       id: "PZ-03",
-      type: "Piezometer (Tekanan Pori)",
+      ...meta("PZ-03", "Piezometer"),
       unit: "kPa",
       online: true,
       quality: opts?.structureAlert ? "Outlier" : "Valid",
@@ -103,7 +114,7 @@ export function validateSensors(
     },
     {
       id: "SP-01",
-      type: "Rembesan (V-Notch)",
+      ...meta("SP-01", "Rembesan"),
       unit: "L/s",
       online: true,
       quality: opts?.seepageAnomaly ? "Outlier" : "Valid",
@@ -112,7 +123,7 @@ export function validateSensors(
     },
     {
       id: "DF-02",
-      type: "Deformasi (GNSS)",
+      ...meta("DF-02", "GNSS"),
       unit: "mm",
       online: false,
       quality: "Missing",
@@ -121,7 +132,7 @@ export function validateSensors(
     },
     {
       id: "SPW-01",
-      type: "Status Spillway",
+      ...meta("SPW-01", "Pelimpah"),
       unit: "",
       online: !!r,
       quality: r ? "Valid" : "Missing",
@@ -130,7 +141,7 @@ export function validateSensors(
     },
     {
       id: "GW-01",
-      type: "IoT Gateway",
+      ...meta("GW-01", "Gateway"),
       unit: "",
       online: !wlOffline,
       quality: wlOffline ? "Stale" : "Valid",

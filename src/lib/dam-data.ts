@@ -13,7 +13,9 @@ export const STORAGE = {
   nwl: 17_750_000,
   hwl: 21_197_404,
   effectiveReported: 12_600_000,
+  /** Tampungan maksimum rancangan — acuan persentase di dashboard. */
   maxReported: 27_460_000,
+  max: 27_460_000,
 };
 
 /** Lokasi perencanaan — proposal LRBN SENGKALING-64. */

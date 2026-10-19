@@ -80,7 +80,7 @@ export function evaluateRules(
         "DATA TIDAK VALID",
         {},
         validation.messages.join(" ") || "Sensor kritis tidak tersedia.",
-        "Verifikasi sensor muka air dan gateway IoT sebelum mengikuti rekomendasi otomatis.",
+        "Verifikasi WL-01 & GW-01 Bendungan Sengkaling sebelum FEWS/DEWS otomatis aktif.",
         t,
       ),
     );
@@ -222,7 +222,7 @@ export function statusBadgeClass(status: FewsStatus | DewsStatus): string {
     case "WASPADA":
       return "bg-warning/20 text-warning";
     case "SIAGA":
-      return "bg-orange-500/20 text-orange-400";
+      return "bg-orange-100 text-orange-700";
     case "KRITIS":
       return "bg-destructive/20 text-destructive";
     default:

@@ -1,5 +1,6 @@
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { storageAt, LEVELS } from "./dam-data";
+import { TELEMETRY_SOURCE_LABEL } from "./sengkaling-monitoring";
 import { getActiveScenario, sampleForScenario, setActiveScenario, type SimScenarioId } from "./simulation-scenarios";
 
 // Adapter layer: swap `simulatedSource` with a real API/MQTT source later.
@@ -17,7 +18,7 @@ function sample(t: number): Reading {
 }
 
 export const simulatedSource: TelemetrySource = {
-  name: "Simulator (Demo) — SIMULASI",
+  name: TELEMETRY_SOURCE_LABEL,
   live: false,
   history(hours, points) {
     const now = Date.now();

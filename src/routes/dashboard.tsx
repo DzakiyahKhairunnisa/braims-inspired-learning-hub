@@ -2,15 +2,18 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import {
   LayoutDashboard, Activity, Radio, BrainCircuit, CloudRain, Sun, Sprout, ShieldCheck, FileBarChart, Settings,
-  Waves, Download, Search, Menu, ClipboardList, GitBranch, Zap,
+  Waves, Download, Search, Menu, ClipboardList, GitBranch, Zap, Send,
 } from "lucide-react";
 import {
   Area, AreaChart, CartesianGrid, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis, Legend,
 } from "recharts";
 import { ReservoirGauge } from "@/components/ReservoirGauge";
 import { OperatorCenter } from "@/components/dashboard/OperatorCenter";
+import { OperatorMessageComposer } from "@/components/dashboard/OperatorMessageComposer";
 import { NotificationBell } from "@/components/dashboard/NotificationPanel";
 import { LEVELS, STORAGE } from "@/lib/dam-data";
+import { operatorTasksForRecommendation } from "@/lib/operator-requests";
+import { OperatorRequestLists } from "@/components/dashboard/OperatorRequestLists";
 import { DEFAULT_DAM_CONFIG } from "@/lib/dam-config";
 import { changeSimulationScenario, fmtTime, useTelemetry } from "@/lib/telemetry";
 import { SIM_SCENARIOS } from "@/lib/simulation-scenarios";
@@ -23,6 +26,7 @@ import { OperationPipeline } from "@/components/dashboard/OperationPipeline";
 import { OperatorBriefingCard } from "@/components/dashboard/OperatorBriefingCard";
 import { FloatingPvPanel, FloatingPvCompact } from "@/components/dashboard/FloatingPvPanel";
 import { OverviewStatusHero } from "@/components/dashboard/OverviewStatusHero";
+import { SENGKALING_ASSET, SENGKALING_DATA_STACK, SENGKALING_LEVELS_GUIDE } from "@/lib/sengkaling-monitoring";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
@@ -45,6 +49,7 @@ const NAV = [
   { k: "fews", l: "FEWS", i: CloudRain },
   { k: "dews", l: "DEWS", i: Sun },
   { k: "fpv", l: "Floating PV", i: Zap },
+  { k: "kirim", l: "Kirim Instruksi", i: Send },
   { k: "operator", l: "Operator Center", i: ClipboardList },
   { k: "irrigation", l: "Distribusi Air", i: Sprout },
   { k: "safety", l: "Keselamatan / RTD", i: ShieldCheck },
@@ -64,10 +69,10 @@ function Dashboard() {
   const [hours, setHours] = useState(24);
   const [open, setOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
-  const [maxStorage, setMaxStorage] = useState<number>(STORAGE.hwl);
+  const [maxStorage] = useState<number>(STORAGE.max);
   const tel = useTelemetry(hours);
   const { current, trend, dhdt, storage, data, source, scenario } = tel;
-  const { validation, forecast, ml, rules } = useDamSystem(data, current, dhdt, scenario);
+  const { validation, forecast, ml, rules, operatorDispatch } = useDamSystem(data, current, dhdt, scenario);
   const operatorState = useOperatorStore();
   const chart = useMemo(() => data.map((d) => ({ ...d, time: fmtTime(d.t) })), [data]);
   const dataOk = validation.dataValid;
@@ -85,9 +90,9 @@ function Dashboard() {
   );
 
   return (
-    <div className="dark min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-gradient-to-b from-emerald-50/80 via-background to-sky-50/50 text-foreground">
       <div className="flex">
-        <aside className={`fixed inset-y-0 left-0 z-50 w-64 border-r border-sidebar-border bg-sidebar transition-transform md:sticky md:top-0 md:h-screen md:translate-x-0 ${open ? "translate-x-0" : "-translate-x-full"}`}>
+        <aside className={`fixed inset-y-0 left-0 z-50 w-64 border-r border-emerald-100 bg-white shadow-sm transition-transform md:sticky md:top-0 md:h-screen md:translate-x-0 ${open ? "translate-x-0" : "-translate-x-full"}`}>
           <Link to="/" className="flex items-center gap-2 border-b border-sidebar-border px-5 py-5">
             <span className="grid size-9 place-items-center rounded-lg bg-water"><Waves className="size-5 text-navy-foreground" /></span>
             <span className="leading-tight text-sidebar-foreground">
@@ -114,7 +119,7 @@ function Dashboard() {
         {open && <div className="fixed inset-0 z-40 bg-background/70 md:hidden" onClick={() => setOpen(false)} />}
 
         <main className="min-w-0 flex-1">
-          <header className="sticky top-0 z-30 flex flex-wrap items-center gap-3 border-b border-border bg-background/90 px-4 py-3 backdrop-blur md:px-8">
+          <header className="sticky top-0 z-30 flex flex-wrap items-center gap-3 border-b border-emerald-100 bg-white/95 px-4 py-3 shadow-sm backdrop-blur md:px-8">
             <button className="md:hidden" onClick={() => setOpen(true)} aria-label="Menu"><Menu className="size-5" /></button>
             <h1 className="font-display text-lg font-semibold">{NAV.find((n) => n.k === tab)?.l}</h1>
             <span className="rounded-full bg-warning/20 px-2.5 py-1 text-[11px] font-semibold text-warning">SIMULASI · DEMO</span>
@@ -127,7 +132,7 @@ function Dashboard() {
               <span className="hidden sm:inline">Sumber: {source.name}</span>
               <span className="hidden lg:inline">Update: {current ? fmtTime(current.t) : "—"}</span>
               <NotificationBell notifications={operatorState.notifications} open={notifOpen} onToggle={() => setNotifOpen((v) => !v)} />
-              <span className="grid size-8 place-items-center rounded-full bg-secondary font-semibold text-foreground">OP</span>
+              <span className="grid size-8 place-items-center rounded-full bg-secondary text-xs font-semibold text-foreground">BU</span>
             </div>
           </header>
 
@@ -135,20 +140,31 @@ function Dashboard() {
             {tab === "overview" && (
               <>
                 <OverviewStatusHero fews={rules.fews} dews={rules.dews} dataOk={dataOk} level={current?.level} />
-                <OperatorBriefingCard briefing={briefing} onOpenOperator={() => setTab("operator")} />
+                <OperatorBriefingCard briefing={briefing} dispatch={operatorDispatch} onOpenOperator={() => setTab("operator")} />
                 <OperationPipeline steps={pipelineSteps} />
                 <div className="grid gap-4 lg:grid-cols-[1fr_280px]">
-                  <Panel title="Rekomendasi terbaru">
+                  <Panel title="Permintaan ke Operator BU">
                     {rules.recommendations.length === 0 && (
-                      <p className="text-sm text-muted-foreground">Tidak ada rekomendasi aktif — kondisi dalam rentang normal.</p>
+                      <>
+                        <p className="text-sm text-muted-foreground">Tidak ada alarm aktif. Pemantauan rutin:</p>
+                        <div className="mt-3">
+                          <OperatorRequestLists payload={operatorDispatch} />
+                        </div>
+                      </>
                     )}
-                    <ul className="space-y-3">
-                      {rules.recommendations.map((r) => (
-                        <li key={r.id} className="rounded-lg border border-border bg-muted/40 px-4 py-3 text-sm">
-                          <p className="font-semibold">{r.title}</p>
-                          <p className="mt-1 text-muted-foreground">{r.recommendedAction}</p>
-                        </li>
-                      ))}
+                    <ul className="space-y-4">
+                      {rules.recommendations.map((r) => {
+                        const tasks = operatorTasksForRecommendation(r, rules.fews, rules.dews);
+                        return (
+                          <li key={r.id} className="rounded-xl border border-emerald-100 bg-white px-4 py-4 text-sm shadow-sm">
+                            <p className="font-semibold text-primary">{r.title}</p>
+                            <p className="mt-1 text-muted-foreground">{tasks.ringkasan}</p>
+                            <div className="mt-3">
+                              <OperatorRequestLists payload={tasks} compact />
+                            </div>
+                          </li>
+                        );
+                      })}
                     </ul>
                   </Panel>
                   <FloatingPvCompact ops={fpvOps} onClick={() => setTab("fpv")} />
@@ -158,24 +174,21 @@ function Dashboard() {
             {tab === "flow" && (
               <div className="space-y-6">
                 <OperationPipeline steps={pipelineSteps} />
-                <Panel title="Peran tiap lapisan (ringkas)">
-                  <div className="grid gap-4 md:grid-cols-2">
-                    {[
-                      ["Sensor & ADAS", "Mengambil dan memvalidasi muka air, hujan, debit, serta instrumen keamanan. Data rusak tidak dipakai untuk rekomendasi otomatis."],
-                      ["IoT & basis data", "Menyimpan deret waktu dan status koneksi gateway. Frekuensi akuisisi dapat dinaikkan saat FEWS/DEWS aktif (konfigurasi)."],
-                      ["Prediksi", "Memberi gambaran tren 1–24 jam ke depan (model demo). Membantu operator, bukan pengganti inspeksi lapangan."],
-                      ["FEWS / DEWS", "Menggabungkan pengukuran, tren, dan prediksi untuk status WASPADA–SIAGA–KRITIS serta rekomendasi operasi waduk."],
-                      ["Notifikasi", "Setiap perubahan status penting dikirim ke Operator Utama di dashboard (simulasi; integrasi SMS/email opsional)."],
-                      ["Operator", "Menyetujui, menolak, atau menandai tindakan — tercatat di audit log. Tidak ada perintah langsung ke pintu/outlet nyata."],
-                    ].map(([t, d]) => (
-                      <div key={t} className="rounded-xl bg-muted/50 p-4">
-                        <p className="font-semibold">{t}</p>
-                        <p className="mt-2 text-sm text-muted-foreground">{d}</p>
+                <Panel title={`Integrasi IoT · ADAS · ML · FEWS/DEWS — ${SENGKALING_ASSET.code}`}>
+                  <p className="text-sm text-muted-foreground">{SENGKALING_ASSET.name} · {SENGKALING_ASSET.location}</p>
+                  <div className="mt-4 grid gap-4 md:grid-cols-2">
+                    {SENGKALING_DATA_STACK.map((row) => (
+                      <div key={row.key} className="rounded-xl bg-muted/50 p-4">
+                        <p className="font-semibold">{row.title}</p>
+                        <p className="mt-2 text-sm text-muted-foreground">{row.detail}</p>
                       </div>
                     ))}
                   </div>
+                  <p className="mt-4 text-xs text-muted-foreground">
+                    Notifikasi & workflow ke {SENGKALING_ASSET.operatorBu}. Instruksi WTC lewat tab Kirim Instruksi. Tanpa kendali aktuator otomatis.
+                  </p>
                 </Panel>
-                <OperatorBriefingCard briefing={briefing} onOpenOperator={() => setTab("operator")} />
+                <OperatorBriefingCard briefing={briefing} dispatch={operatorDispatch} onOpenOperator={() => setTab("operator")} />
               </div>
             )}
             {tab === "live" && (
@@ -198,7 +211,8 @@ function Dashboard() {
                           <Tooltip contentStyle={tip} />
                           <Legend wrapperStyle={{ fontSize: 12 }} />
                           <ReferenceLine yAxisId="z" y={LEVELS.FEWS} stroke="var(--warning)" strokeDasharray="4 4" label={{ value: "FEWS +113", fontSize: 10 }} />
-                          <ReferenceLine yAxisId="z" y={LEVELS.NWL} stroke="var(--success)" strokeDasharray="2 2" />
+                          <ReferenceLine yAxisId="z" y={LEVELS.NWL} stroke="var(--success)" strokeDasharray="2 2" label={{ value: "NWL +119", fontSize: 10 }} />
+                          <ReferenceLine yAxisId="z" y={LEVELS.HWL} stroke="var(--destructive)" strokeDasharray="3 3" label={{ value: "HWL +123", fontSize: 10 }} />
                           <Line yAxisId="z" dataKey="level" name="Muka air (m)" stroke="var(--chart-1)" dot={false} strokeWidth={2} />
                           <Line yAxisId="q" dataKey="qin" name="Qin (m³/s)" stroke="var(--chart-2)" dot={false} />
                           <Line yAxisId="q" dataKey="qout" name="Qout (m³/s)" stroke="var(--chart-4)" dot={false} />
@@ -222,6 +236,9 @@ function Dashboard() {
             {tab === "ml" && <MlPanel forecast={forecast} ml={ml} />}
             {tab === "fews" && <FewsPanel r={current} rules={rules} forecast={forecast} dataOk={dataOk} />}
             {tab === "dews" && <DewsPanel r={current} rules={rules} storage={storage} dataOk={dataOk} />}
+            {tab === "kirim" && (
+              <OperatorMessageComposer suggestedElevation={dataOk ? current?.level : undefined} />
+            )}
             {tab === "operator" && <OperatorCenter state={operatorState} />}
             {tab === "irrigation" && <Irrigation r={current} dews={rules.dews} />}
             {tab === "safety" && <Safety validation={validation} />}
@@ -262,13 +279,11 @@ function Dashboard() {
                   </dl>
                   <p className="mt-3 text-xs text-muted-foreground">Nilai dapat disesuaikan di src/lib/dam-config.ts setelah validasi SOP.</p>
                 </Panel>
-                <Panel title="Konfigurasi Tampungan">
-                  <p className="text-sm text-muted-foreground">Pilih acuan volume untuk persentase tampungan.</p>
-                  <div className="mt-4 flex flex-wrap gap-3">
-                    {[{ v: STORAGE.hwl, l: "21,197 jt m³ (tabel elevasi HWL)" }, { v: STORAGE.maxReported, l: "27,46 jt m³ (tampungan maks. dilaporkan)" }].map((o) => (
-                      <button key={o.v} onClick={() => setMaxStorage(o.v)} className={`rounded-lg border px-4 py-3 text-sm ${maxStorage === o.v ? "border-primary bg-primary/10 text-primary" : "border-border"}`}>{o.l}</button>
-                    ))}
-                  </div>
+                <Panel title="Acuan Tampungan Dashboard">
+                  <p className="text-sm text-muted-foreground">
+                    Persentase tampungan dihitung terhadap <b className="text-foreground">tampungan maksimum 27,46 jt m³</b> (rancangan).
+                    Volume pada HWL (+123 m) dalam tabel elevasi: {(STORAGE.hwl / 1e6).toFixed(3)} jt m³.
+                  </p>
                 </Panel>
               </div>
             )}
@@ -281,7 +296,7 @@ function Dashboard() {
 
 function Panel({ title, right, children }: { title: string; right?: React.ReactNode; children: React.ReactNode }) {
   return (
-    <section className="rounded-xl border border-border bg-card p-5">
+    <section className="rounded-xl border border-emerald-100/80 bg-white p-5 shadow-card">
       <div className="mb-4 flex items-center justify-between gap-3">
         <h2 className="font-display text-base font-semibold">{title}</h2>{right}
       </div>
@@ -302,7 +317,7 @@ function Kpis({
 }) {
   const items = [
     { l: "Muka Air", v: r ? `+${r.level.toFixed(2)}` : "—", u: "m" },
-    { l: "Tampungan", v: r ? (storage / 1e6).toFixed(2) : "—", u: `jt m³ · ${r ? ((storage / max) * 100).toFixed(0) : "—"}%` },
+    { l: "Tampungan", v: r ? (storage / 1e6).toFixed(2) : "—", u: `jt m³ · ${r ? ((storage / max) * 100).toFixed(0) : "—"}% dari maks. 27,46 jt` },
     { l: "Inflow Qin", v: r?.qin.toFixed(1) ?? "—", u: "m³/s" },
     { l: "Outlet Qout", v: r?.qout.toFixed(1) ?? "—", u: "m³/s" },
     { l: "Curah Hujan", v: r?.rain.toFixed(1) ?? "—", u: "mm" },
@@ -313,7 +328,7 @@ function Kpis({
   return (
     <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
       {items.map((k) => (
-        <div key={k.l} className="rounded-xl border border-border bg-card p-4">
+        <div key={k.l} className="rounded-xl border border-emerald-100 bg-white p-4 shadow-sm">
           <p className="text-xs uppercase tracking-wider text-muted-foreground">{k.l}</p>
           <p className={`mt-2 font-display text-2xl font-bold ${k.cls ?? ""}`}>{k.v}</p>
           <p className="text-xs text-muted-foreground">{k.u}</p>
@@ -333,7 +348,7 @@ function SensorTable({
   const [q, setQ] = useState("");
   const rows = sensors.filter((s) => (s.id + s.type).toLowerCase().includes(q.toLowerCase()));
   return (
-    <Panel title="Sensor ADAS & IoT" right={
+    <Panel title={`Sensor ADAS & IoT · ${SENGKALING_ASSET.code}`} right={
       <label className="flex items-center gap-2 rounded-lg border border-border bg-muted px-3 py-1.5 text-sm">
         <Search className="size-4 text-muted-foreground" />
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Cari sensor" className="w-32 bg-transparent outline-none" />
@@ -347,13 +362,14 @@ function SensorTable({
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="text-left text-xs uppercase text-muted-foreground">
-            <tr>{["ID", "Tipe", "Nilai", "Unit", "Update", "Sinyal", "Kualitas"].map((h) => <th key={h} className="px-3 py-2">{h}</th>)}</tr>
+            <tr>{["ID", "Tipe", "Lokasi", "Nilai", "Unit", "Update", "Sinyal", "Kualitas"].map((h) => <th key={h} className="px-3 py-2">{h}</th>)}</tr>
           </thead>
           <tbody>
             {rows.map((s) => (
               <tr key={s.id} className="border-t border-border">
                 <td className="px-3 py-2.5 font-mono">{s.id}</td>
                 <td className="px-3 py-2.5">{s.type}</td>
+                <td className="max-w-[200px] px-3 py-2.5 text-xs text-muted-foreground">{s.location}</td>
                 <td className="px-3 py-2.5 font-mono">{s.value ?? "—"}</td>
                 <td className="px-3 py-2.5 text-muted-foreground">{s.unit}</td>
                 <td className="px-3 py-2.5 text-muted-foreground">{s.lastUpdate ? fmtTime(s.lastUpdate) : "—"}</td>
@@ -381,8 +397,11 @@ function MlPanel({
 }) {
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
-      <Panel title="Prediksi Muka Air">
+      <Panel title="Prediksi Muka Air — Waduk Sengkaling">
         <p className="mb-3 text-xs font-semibold text-warning">{ML_DEMO_LABEL}</p>
+        <p className="mb-3 text-xs text-muted-foreground">
+          Garis referensi: FEWS +{SENGKALING_LEVELS_GUIDE.fews.z} m · NWL +{SENGKALING_LEVELS_GUIDE.nwl.z} m · LWL +{SENGKALING_LEVELS_GUIDE.lwl.z} m
+        </p>
         <div className="h-80">
           <ResponsiveContainer>
             <AreaChart data={forecast}>
@@ -391,6 +410,7 @@ function MlPanel({
               <YAxis domain={["auto", "auto"]} fontSize={11} stroke="var(--muted-foreground)" />
               <Tooltip contentStyle={tip} />
               <ReferenceLine y={LEVELS.FEWS} stroke="var(--warning)" strokeDasharray="4 4" />
+              <ReferenceLine y={LEVELS.NWL} stroke="var(--success)" strokeDasharray="2 2" />
               <ReferenceLine y={LEVELS.LWL} stroke="var(--muted-foreground)" strokeDasharray="4 4" />
               <Area dataKey="upper" stroke="none" fill="var(--chart-1)" fillOpacity={0.12} name="Batas atas" />
               <Area dataKey="elevation" stroke="var(--chart-1)" fill="none" strokeWidth={2} name="Prediksi (m)" />
@@ -422,8 +442,11 @@ function FewsPanel({
 }) {
   return (
     <div className="grid gap-6 lg:grid-cols-2">
-      <Panel title="Flood Early Warning System">
+      <Panel title="FEWS — Bendungan Sengkaling">
         <p className={`inline-block rounded-full px-3 py-1 text-sm font-bold ${statusBadgeClass(rules.fews)}`}>{rules.fews}</p>
+        <p className="mt-2 text-xs text-muted-foreground">
+          Trigger +{SENGKALING_LEVELS_GUIDE.fews.z} m · NWL +{SENGKALING_LEVELS_GUIDE.nwl.z} m · HWL +{SENGKALING_LEVELS_GUIDE.hwl.z} m · {SENGKALING_LEVELS_GUIDE.fews.note}
+        </p>
         <ul className="mt-4 list-disc space-y-1 pl-5 text-sm text-muted-foreground">
           {rules.factors.filter((f) => !f.includes("DEWS")).map((f) => <li key={f}>{f}</li>)}
         </ul>
@@ -451,8 +474,11 @@ function DewsPanel({
 }) {
   return (
     <div className="grid gap-6 lg:grid-cols-2">
-      <Panel title="Drought Early Warning System">
+      <Panel title="DEWS — Bendungan Sengkaling">
         <p className={`inline-block rounded-full px-3 py-1 text-sm font-bold ${statusBadgeClass(rules.dews)}`}>{rules.dews}</p>
+        <p className="mt-2 text-xs text-muted-foreground">
+          LWL +{SENGKALING_LEVELS_GUIDE.lwl.z} m · irigasi 3.500 ha · air baku 76 L/det · {SENGKALING_LEVELS_GUIDE.lwl.note}
+        </p>
         <p className="mt-4 text-sm text-muted-foreground">Estimasi tampungan: <b className="text-foreground">{(storage / 1e6).toFixed(2)} jt m³</b></p>
         {rules.timeToLwlHours != null && dataOk && (
           <p className="mt-2 text-sm text-muted-foreground">Estimasi menuju ambang LWL+margin (proxy): ~{rules.timeToLwlHours.toFixed(1)} interval</p>

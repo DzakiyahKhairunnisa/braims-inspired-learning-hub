@@ -1,3 +1,5 @@
+import { WTC_INSTRUCTION } from "./wtc-instructions";
+import { SENGKALING_ASSET } from "./sengkaling-monitoring";
 import type { ValidationResult } from "./sensor-validation";
 import type { RuleEngineOutput, FewsStatus, DewsStatus } from "./rule-engine";
 import type { OperationalRecommendation } from "./rule-engine";
@@ -28,14 +30,14 @@ export interface OperatorBriefing {
 }
 
 const STEPS_META: { id: PipelineStepId; title: string; subtitle: string }[] = [
-  { id: "sensor", title: "Sensor lapangan", subtitle: "AWLR, hujan, debit, struktur" },
-  { id: "adas", title: "ADAS", subtitle: "Akuisisi & cek kualitas data" },
-  { id: "iot", title: "Gateway IoT", subtitle: "Transmisi ke pusat data" },
-  { id: "database", title: "Basis data", subtitle: "Deret waktu terpusat" },
-  { id: "ml", title: "Prediksi", subtitle: "Tren muka air & risiko (demo)" },
-  { id: "rules", title: "FEWS / DEWS", subtitle: "Status & rekomendasi operasi" },
-  { id: "notify", title: "Notifikasi", subtitle: "Ke Operator Utama" },
-  { id: "operator", title: "Keputusan", subtitle: "Setujui / tolak / verifikasi" },
+  { id: "sensor", title: "Sensor BSK-SBW", subtitle: "WL-01, RG-01, Q-IN/OUT, struktur" },
+  { id: "adas", title: "ADAS", subtitle: "Validasi elevasi & instrumen Sengkaling" },
+  { id: "iot", title: "IoT GW-01", subtitle: "Tele-O ke pusat data (simulasi)" },
+  { id: "database", title: "Basis data", subtitle: "Deret waktu waduk Sengkaling" },
+  { id: "ml", title: "Prediksi ML", subtitle: "Masukan FEWS/DEWS (baseline demo)" },
+  { id: "rules", title: "FEWS / DEWS", subtitle: "Ambang +113 / +119 / +123 & DEWS" },
+  { id: "notify", title: "Notifikasi", subtitle: WTC_INSTRUCTION.recipientLabel },
+  { id: "operator", title: "Operator BU", subtitle: "ACK · verifikasi · eksekusi (dashboard)" },
 ];
 
 export function buildPipelineSteps(
@@ -83,7 +85,7 @@ export function buildOperatorBriefing(
     return {
       headline: "Verifikasi data sebelum keputusan operasi",
       summary:
-        "Sensor kritis tidak valid. Sistem tidak mengirim rekomendasi pelepasan otomatis; Operator Utama harus memverifikasi instrumen dan kondisi lapangan.",
+        `Sensor kritis tidak valid di ${SENGKALING_ASSET.name}. FEWS/DEWS ditahan; ${SENGKALING_ASSET.operatorBu} memverifikasi instrumen dan lapangan.`,
       actions: [
         "Buka tab Sensor & IoT dan cek WL-01 / gateway.",
         "Gunakan VERIFY DATA di Operator Center setelah data diperbaiki.",
@@ -98,7 +100,7 @@ export function buildOperatorBriefing(
     return {
       headline: "Kondisi hidrologi kritis — koordinasi RTD",
       summary:
-        "FEWS KRITIS: sistem mengirim notifikasi prioritas ke Operator Utama. Ikuti prosedur darurat dan verifikasi lapangan; tidak ada perintah otomatis ke pintu bendungan.",
+        `FEWS KRITIS ${SENGKALING_ASSET.code}: notifikasi ke Operator BU & koordinasi WTC BWS NTB I. RTD bendungan; tanpa kendali pintu otomatis dari dashboard.`,
       actions: recommendations.filter((r) => r.system === "FEWS" || r.system === "SAFETY").map((r) => r.recommendedAction),
       notifyOperator: true,
       priority: "kritis",
@@ -109,7 +111,7 @@ export function buildOperatorBriefing(
     return {
       headline: "Evaluasi pelepasan air terkendali",
       summary:
-        "Elevasi atau prediksi mendekati batas operasi atas. Notifikasi dikirim ke Operator Utama untuk meninjau outlet, kapasitas hilir, dan skenario pelepasan.",
+        "Elevasi atau prediksi mendekati batas operasi atas. Operator BU meninjau outlet, kapasitas hilir, dan skenario pelepasan.",
       actions: recommendations.filter((r) => r.system === "FEWS").map((r) => r.recommendedAction),
       notifyOperator: true,
       priority: "tinggi",
@@ -120,7 +122,7 @@ export function buildOperatorBriefing(
     return {
       headline: "Pantau banjir — siapkan ruang tampungan",
       summary:
-        "Inflow, hujan, atau tren muka air meningkat. Operator Utama menerima ringkasan FEWS WASPADA beserta rekomendasi evaluasi outlet.",
+        "Inflow, hujan, atau tren muka air meningkat. Ringkasan FEWS WASPADA dan rekomendasi evaluasi outlet dikirim ke Operator BU.",
       actions: recommendations.filter((r) => r.system === "FEWS").map((r) => r.recommendedAction),
       notifyOperator: true,
       priority: "sedang",
@@ -131,7 +133,7 @@ export function buildOperatorBriefing(
     return {
       headline: "Konservasi tampungan — prioritas alokasi air",
       summary:
-        "DEWS SIAGA: proyeksi mendekati LWL. Notifikasi ke Operator Utama untuk menyesuaikan distribusi irigasi dan pelepasan non-prioritas.",
+        "DEWS SIAGA: proyeksi mendekati LWL. Operator BU menyesuaikan distribusi irigasi dan pelepasan non-prioritas.",
       actions: recommendations.filter((r) => r.system === "DEWS").map((r) => r.recommendedAction),
       notifyOperator: true,
       priority: "tinggi",
@@ -142,7 +144,7 @@ export function buildOperatorBriefing(
     return {
       headline: "Pantau kekeringan — efisiensi distribusi",
       summary:
-        "Tren penurunan muka air dan inflow rendah. Operator Utama diminta meninjau pola pelepasan dan kebutuhan air baku/irigasi.",
+        "Tren penurunan muka air dan inflow rendah. Operator BU meninjau pola pelepasan dan kebutuhan air baku/irigasi.",
       actions: recommendations.filter((r) => r.system === "DEWS").map((r) => r.recommendedAction),
       notifyOperator: true,
       priority: "sedang",
@@ -152,7 +154,7 @@ export function buildOperatorBriefing(
   return {
     headline: "Operasi dalam rentang normal",
     summary:
-      "Data valid, FEWS dan DEWS normal. Sistem tetap memantau setiap 5 detik (simulasi) dan mencatat perubahan ke Operator Utama jika status berubah.",
+      "Data valid, FEWS dan DEWS normal. Sistem memantau setiap 5 detik (simulasi) dan mencatat perubahan ke Operator BU jika status berubah.",
     actions: ["Lanjutkan monitoring berkala.", "Tinjau prediksi ML untuk perencanaan 6–24 jam ke depan."],
     notifyOperator: false,
     priority: "normal",

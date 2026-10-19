@@ -23,14 +23,14 @@ const ring = (state: PipelineStep["state"]) => {
 
 export function OperationPipeline({ steps }: { steps: PipelineStep[] }) {
   return (
-    <section className="rounded-2xl border border-border bg-gradient-to-br from-card via-card to-primary/5 p-5 md:p-6">
+    <section className="rounded-2xl border border-sky-100 bg-gradient-to-br from-white via-sky-50/40 to-emerald-50/50 p-5 shadow-card md:p-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">Alur keputusan</p>
-          <h2 className="mt-1 font-display text-lg font-bold md:text-xl">Dari sensor hingga Operator Utama</h2>
+          <h2 className="mt-1 font-display text-lg font-bold md:text-xl">BSK-SBW: sensor → ADAS → IoT → ML → FEWS/DEWS → Operator BU</h2>
           <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-            Data lapangan divalidasi ADAS, dianalisis (termasuk prediksi demo), lalu FEWS/DEWS menghasilkan rekomendasi.
-            Notifikasi masuk ke Operator Utama — keputusan disimpan di audit log, tanpa kendali aktuator otomatis.
+            Telemetri Bendungan Sengkaling divalidasi ADAS, dikirim GW-01, diprediksi ML baseline, lalu dinilai FEWS/DEWS (+113 / +119 / +123 m & DEWS LWL).
+            Notifikasi ke Operator BU; instruksi real-time dari WTC — tanpa kendali aktuator otomatis.
           </p>
         </div>
       </div>

@@ -2,7 +2,8 @@ import type { Reading } from "./telemetry";
 import { DEFAULT_DAM_CONFIG } from "./dam-config";
 import { LEVELS } from "./dam-data";
 
-export const ML_DEMO_LABEL = "MODEL DEMO — BELUM DILATIH DENGAN DATA LAPANGAN";
+export const ML_DEMO_LABEL =
+  "Baseline ML Bendungan Sengkaling (LRBN-64) — demonstrasi tren; belum dilatih data lapangan BSK-SBW";
 
 export interface ElevationForecastPoint {
   hoursAhead: number;
@@ -58,7 +59,7 @@ export function assessMlRisk(data: Reading[], forecast: ElevationForecastPoint[]
   let floodRiskTrend: MlRiskInsight["floodRiskTrend"] = "stabil";
   if (maxF >= LEVELS.NWL - 1) {
     floodRiskTrend = "naik";
-    factors.push(`Prediksi mendekati/melampaui NWL (+${LEVELS.NWL} m) dalam horizon terdekat`);
+    factors.push(`Prediksi FEWS: mendekati/melampaui NWL Sengkaling (+${LEVELS.NWL} m)`);
   } else if (maxF > last.level + 0.3) {
     floodRiskTrend = "naik";
     factors.push("Tren kenaikan muka air diproyeksikan berlanjut");
@@ -72,7 +73,7 @@ export function assessMlRisk(data: Reading[], forecast: ElevationForecastPoint[]
   let droughtDeficitRisk: MlRiskInsight["droughtDeficitRisk"] = "rendah";
   if (minF <= LEVELS.LWL + DEFAULT_DAM_CONFIG.dewsSiagaMarginAboveLwl) {
     droughtDeficitRisk = "tinggi";
-    factors.push(`Proyeksi mendekati LWL (+${LEVELS.LWL} m)`);
+    factors.push(`Proyeksi DEWS: mendekati LWL Sengkaling (+${LEVELS.LWL} m)`);
   } else if (minF < LEVELS.FEWS && last.qin < 25) {
     droughtDeficitRisk = "sedang";
     factors.push("Inflow rendah dengan tren penurunan tampungan");

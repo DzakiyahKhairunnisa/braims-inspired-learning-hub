@@ -28,8 +28,9 @@ export const DEFAULT_DAM_CONFIG: DamOperationalConfig = {
   dewsSiagaMarginAboveLwl: 3,
   mlHorizonsHours: [1, 3, 6, 12, 24],
   emergencyContacts: [
-    { role: "Operator Utama", name: "— (konfigurasi)", phone: "—" },
-    { role: "Engineer Bendungan", name: "— (konfigurasi)", phone: "—" },
+    { role: "Operator BU Bendungan Sengkaling", name: "— (konfigurasi)", phone: "—" },
+    { role: "WTC / Unit Alokasi Air BWS NTB I", name: "— (konfigurasi)", phone: "—" },
+    { role: "Engineer Bendungan (tim LRBN-64 / PU)", name: "— (konfigurasi)", phone: "—" },
     { role: "BPBD Kab. Sumbawa", name: "— (konfigurasi)", phone: "—" },
   ],
 };

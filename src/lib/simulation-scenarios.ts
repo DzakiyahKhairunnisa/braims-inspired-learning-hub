@@ -18,14 +18,14 @@ export interface SimScenarioMeta {
 }
 
 export const SIM_SCENARIOS: SimScenarioMeta[] = [
-  { id: "default", label: "Simulasi Dinamis", description: "Pola sinusoidal demo (default)." },
-  { id: "normal", label: "Normal", description: "Elevasi stabil di sekitar NWL − 4 m." },
-  { id: "drought", label: "DEWS — Defisit", description: "Elevasi turun, inflow rendah." },
-  { id: "near_lwl", label: "DEWS — Dekat LWL", description: "Proyeksi menuju LWL +101 m." },
-  { id: "flood", label: "FEWS — Hujan & Inflow", description: "Hujan dan inflow meningkat, elevasi naik." },
-  { id: "near_nwl", label: "FEWS — Dekat NWL", description: "Elevasi mendekati NWL +119 m." },
-  { id: "sensor_offline", label: "Sensor Terputus", description: "Muka air tidak valid." },
-  { id: "structure_anomaly", label: "Anomali Struktur", description: "Piezometer/rembesan perlu verifikasi." },
+  { id: "default", label: "Sengkaling — Dinamis", description: "Telemetri demo sekitar FEWS +113 m (default)." },
+  { id: "normal", label: "Operasi Normal", description: "TMA ~+110,5 m (di bawah trigger FEWS +113 m)." },
+  { id: "drought", label: "DEWS — Defisit", description: "Inflow rendah, tren turun (irigasi 3.500 ha)." },
+  { id: "near_lwl", label: "DEWS — Dekat LWL", description: "Menuju LWL +101 m — konservasi tampungan." },
+  { id: "flood", label: "FEWS — Hujan & Inflow", description: "Hujan RG-01 & Q-IN naik — uji WASPADA FEWS." },
+  { id: "near_nwl", label: "FEWS — Dekat NWL", description: "TMA mendekati NWL +119 m — uji SIAGA." },
+  { id: "sensor_offline", label: "WL-01 Terputus", description: "ADAS memblokir FEWS/DEWS otomatis." },
+  { id: "structure_anomaly", label: "Anomali Struktur", description: "PZ-03 / SP-01 — prioritas keselamatan bendungan." },
 ];
 
 let activeScenario: SimScenarioId = "default";
