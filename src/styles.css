@@ -154,7 +154,7 @@
 
 @layer base {
   body { font-family: var(--font-sans); }
-  h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.02em; }
+  h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.005em; }
 }
 @utility bg-water { background-image: var(--gradient-water); }
 @utility bg-fade { background-image: var(--gradient-fade); }
