@@ -23,12 +23,6 @@ const GALLERY = [
   "/gallery/sengkaling-07.jpg",
   "/gallery/sengkaling-08.jpg",
   "/gallery/sengkaling-09.jpg",
-  "/gallery/sengkaling-10.jpg",
-  "/gallery/sengkaling-11.jpg",
-  "/gallery/sengkaling-12.jpg",
-  "/gallery/sengkaling-13.jpg",
-  "/gallery/sengkaling-14.jpg",
-  "/gallery/sengkaling-15.jpg",
 ] as const;
 
 function GalleryPage() {

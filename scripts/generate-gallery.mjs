@@ -1,5 +1,5 @@
 /**
- * Generates 15 placeholder JPG gallery images for the dam design page.
+ * Generates 9 placeholder JPG gallery images (sengkaling-01..09) for the gallery page.
  * Run: node scripts/generate-gallery.mjs
  */
 import { mkdir, writeFile } from "node:fs/promises";
@@ -75,7 +75,7 @@ for (const [file, title, c1, c2] of technical) {
   await writePlaceholder(file, title, c1, c2);
 }
 
-for (let i = 0; i < 15; i++) {
+for (let i = 0; i < 9; i++) {
   const [c1, c2] = palette[i];
   const title = titles[i];
   const svg = `
