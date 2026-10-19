@@ -242,7 +242,7 @@ function SensorTable({ r }: { r?: Reading }) {
 
 function MlPanel({ data }: { data: Reading[] }) {
   const last = data[data.length - 1];
-  const slope = data.length > 8 ? (last.level - data[data.length - 9].level) / 8 : 0;
+  const slope = data.length > 8 && last ? (last.level - data[data.length - 9]!.level) / 8 : 0;
   const forecast = last ? [1, 3, 6, 12, 24].map((h, i) => {
     const z = last.level + slope * h * 2;
     const band = 0.1 + i * 0.12;
