@@ -330,8 +330,8 @@ function Irrigation({ r }: { r?: Reading }) {
 function Safety() {
   return (
     <div className="grid gap-4 md:grid-cols-3">
-      {[["Piezometer", "Tekanan pori stabil", "success"], ["Rembesan", "Satu nilai perlu verifikasi", "warning"], ["Deformasi", "Sensor GNSS terputus", "destructive"]].map(([t, d, c]) => (
-        <Panel key={t} title={t}><p className={`text-sm text-${c}`}>{d}</p></Panel>
+      {[["Piezometer", "Tekanan pori stabil", "text-success"], ["Rembesan", "Satu nilai perlu verifikasi", "text-warning"], ["Deformasi", "Sensor GNSS terputus", "text-destructive"]].map(([t, d, c]) => (
+        <Panel key={t} title={t}><p className={`text-sm ${c}`}>{d}</p></Panel>
       ))}
       <div className="md:col-span-3 text-xs text-muted-foreground">Status ambang tidak sendirian menentukan keselamatan bendungan; evaluasi engineer tetap diperlukan.</div>
     </div>

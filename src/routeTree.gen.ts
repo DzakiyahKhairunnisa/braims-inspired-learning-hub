@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DamProfileRouteImport } from './routes/dam-profile'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as EarlyWarningRouteImport } from './routes/early-warning'
 
 const IndexRoute = IndexRouteImport.update({
@@ -23,6 +24,11 @@ const DamProfileRoute = DamProfileRouteImport.update({
   path: '/dam-profile',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EarlyWarningRoute = EarlyWarningRouteImport.update({
   id: '/early-warning',
   path: '/early-warning',
@@ -32,30 +38,34 @@ const EarlyWarningRoute = EarlyWarningRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dam-profile': typeof DamProfileRoute
+  '/dashboard': typeof DashboardRoute
   '/early-warning': typeof EarlyWarningRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dam-profile': typeof DamProfileRoute
+  '/dashboard': typeof DashboardRoute
   '/early-warning': typeof EarlyWarningRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/dam-profile': typeof DamProfileRoute
+  '/dashboard': typeof DashboardRoute
   '/early-warning': typeof EarlyWarningRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dam-profile' | '/early-warning'
+  fullPaths: '/' | '/dam-profile' | '/dashboard' | '/early-warning'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dam-profile' | '/early-warning'
-  id: '__root__' | '/' | '/dam-profile' | '/early-warning'
+  to: '/' | '/dam-profile' | '/dashboard' | '/early-warning'
+  id: '__root__' | '/' | '/dam-profile' | '/dashboard' | '/early-warning'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DamProfileRoute: typeof DamProfileRoute
+  DashboardRoute: typeof DashboardRoute
   EarlyWarningRoute: typeof EarlyWarningRoute
 }
 
@@ -75,6 +85,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DamProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/early-warning': {
       id: '/early-warning'
       path: '/early-warning'
@@ -88,6 +105,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DamProfileRoute: DamProfileRoute,
+  DashboardRoute: DashboardRoute,
   EarlyWarningRoute: EarlyWarningRoute,
 }
 export const routeTree = rootRouteImport
