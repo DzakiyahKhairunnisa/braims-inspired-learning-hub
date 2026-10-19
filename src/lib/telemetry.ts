@@ -8,7 +8,7 @@ export interface TelemetrySource {
   name: string;
   live: boolean;
   history(hours: number, points: number): Reading[];
-  next(prev: Reading): Reading;
+  next(prev?: Reading): Reading;
 }
 
 function sample(t: number): Reading {
@@ -39,7 +39,7 @@ export function useTelemetry(hours: number, source: TelemetrySource = simulatedS
   useEffect(() => {
     setData(source.history(hours, 96));
     const id = setInterval(() => {
-      setData((d) => (d.length ? [...d.slice(1), source.next(d[d.length - 1])] : d));
+      setData((d) => (d.length ? [...d.slice(1), source.next(d.at(-1))] : d));
     }, 5000);
     return () => clearInterval(id);
   }, [hours, source]);

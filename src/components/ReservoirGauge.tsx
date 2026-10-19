@@ -12,7 +12,7 @@ const markers = [
   { z: LEVELS.LWL, label: "LWL +101", cls: "border-muted-foreground" },
 ];
 
-export function ReservoirGauge({ level }: { level?: number }) {
+export function ReservoirGauge({ level }: { level?: number | undefined }) {
   return (
     <div className="relative h-80 overflow-hidden rounded-xl border border-border bg-muted/40">
       {level !== undefined && (

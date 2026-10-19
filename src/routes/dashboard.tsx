@@ -166,7 +166,7 @@ const modeStyle: Record<string, string> = {
   NORMAL: "text-success", DEWS: "text-warning", FEWS: "text-warning", SPILLWAY: "text-destructive",
 };
 
-function Kpis({ r, storage, max, mode }: { r?: Reading; storage: number; max: number; mode: string }) {
+function Kpis({ r, storage, max, mode }: { r?: Reading | undefined; storage: number; max: number; mode: string }) {
   const items = [
     { l: "Muka Air", v: r ? `+${r.level.toFixed(2)}` : "—", u: "m" },
     { l: "Tampungan", v: r ? (storage / 1e6).toFixed(2) : "—", u: `jt m³ · ${r ? ((storage / max) * 100).toFixed(0) : "—"}%` },
@@ -190,7 +190,7 @@ function Kpis({ r, storage, max, mode }: { r?: Reading; storage: number; max: nu
   );
 }
 
-function sensors(r?: Reading) {
+function sensors(r?: Reading | undefined) {
   const t = r ? fmtTime(r.t) : "—";
   return [
     { id: "WL-01", type: "Water Level (Radar)", m: r?.level.toFixed(2), u: "m", s: "Online", q: "Valid" },
@@ -205,7 +205,7 @@ function sensors(r?: Reading) {
   ].map((x) => ({ ...x, t: x.s === "Disconnected" ? "—" : t }));
 }
 
-function SensorTable({ r }: { r?: Reading }) {
+function SensorTable({ r }: { r?: Reading | undefined }) {
   const [q, setQ] = useState("");
   const rows = sensors(r).filter((s) => (s.id + s.type).toLowerCase().includes(q.toLowerCase()));
   return (
@@ -278,7 +278,7 @@ function MlPanel({ data }: { data: Reading[] }) {
   );
 }
 
-function ModePanel({ kind, r, active }: { kind: "FEWS" | "DEWS"; r?: Reading; active: boolean }) {
+function ModePanel({ kind, r, active }: { kind: "FEWS" | "DEWS"; r?: Reading | undefined; active: boolean }) {
   const fews = kind === "FEWS";
   return (
     <div className="grid gap-6 lg:grid-cols-2">
@@ -305,7 +305,7 @@ function ModePanel({ kind, r, active }: { kind: "FEWS" | "DEWS"; r?: Reading; ac
   );
 }
 
-function Irrigation({ r }: { r?: Reading }) {
+function Irrigation({ r }: { r?: Reading | undefined }) {
   const blocks = [["Blok Utara", 1200], ["Blok Tengah", 1350], ["Blok Selatan", 950]] as const;
   const supply = r ? Math.min(2.5, r.qout * 0.12) : 0;
   return (
