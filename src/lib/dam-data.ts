@@ -54,13 +54,15 @@ const CURVE: [number, number][] = [
   [LEVELS.HWL, STORAGE.hwl],
 ];
 export function storageAt(z: number): number {
-  if (z <= CURVE[0][0]) return CURVE[0][1] * Math.max(0, z - 90) / (CURVE[0][0] - 90);
+  const [first] = CURVE;
+  if (!first) return 0;
+  if (z <= first[0]) return (first[1] * Math.max(0, z - 90)) / (first[0] - 90);
   for (let i = 1; i < CURVE.length; i++) {
-    const [z0, v0] = CURVE[i - 1];
-    const [z1, v1] = CURVE[i];
-    if (z <= z1) return v0 + ((z - z0) / (z1 - z0)) * (v1 - v0);
+    const p0 = CURVE[i - 1]!;
+    const p1 = CURVE[i]!;
+    if (z <= p1[0]) return p0[1] + ((z - p0[0]) / (p1[0] - p0[0])) * (p1[1] - p0[1]);
   }
-  return CURVE[CURVE.length - 1][1];
+  return CURVE[CURVE.length - 1]![1];
 }
 
 export type Mode = "DEWS" | "NORMAL" | "FEWS" | "SPILLWAY";
