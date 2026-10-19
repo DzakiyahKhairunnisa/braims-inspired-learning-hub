@@ -21,29 +21,24 @@ const ring = (state: PipelineStep["state"]) => {
   }
 };
 
-export function OperationPipeline({ steps }: { steps: PipelineStep[] }) {
+export function OperationPipeline({ steps, compact }: { steps: PipelineStep[]; compact?: boolean }) {
   return (
-    <section className="rounded-2xl border border-sky-100 bg-gradient-to-br from-white via-sky-50/40 to-emerald-50/50 p-5 shadow-card md:p-6">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">Alur keputusan</p>
-          <h2 className="mt-1 font-display text-lg font-bold md:text-xl">BSK-SBW: sensor → ADAS → IoT → ML → FEWS/DEWS → Operator BU</h2>
-          <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-            Telemetri Bendungan Sengkaling divalidasi ADAS, dikirim GW-01, diprediksi ML baseline, lalu dinilai FEWS/DEWS (+113 / +119 / +123 m & DEWS LWL).
-            Notifikasi ke Operator BU; instruksi real-time dari WTC — tanpa kendali aktuator otomatis.
-          </p>
-        </div>
-      </div>
-      <div className="mt-6 flex gap-2 overflow-x-auto pb-2 md:flex-wrap md:overflow-visible">
+    <section className={`rounded-xl border border-sky-100 bg-gradient-to-br from-white via-sky-50/40 to-emerald-50/50 shadow-card ${compact ? "p-3" : "p-4 md:p-5"}`}>
+      {!compact && (
+        <p className="mb-3 text-xs text-muted-foreground">
+          Sensor → ADAS → IoT → ML → FEWS/DEWS → Operator BU (simulasi, tanpa kendali aktuator).
+        </p>
+      )}
+      <div className="flex gap-1.5 overflow-x-auto pb-1 md:flex-wrap md:overflow-visible">
         {steps.map((s, i) => (
-          <div key={s.id} className="flex min-w-[140px] flex-1 items-center gap-2">
-            <div className={`flex min-h-[88px] flex-1 flex-col justify-between rounded-xl border p-3 transition ${ring(s.state)}`}>
+          <div key={s.id} className="flex min-w-[120px] flex-1 items-center gap-1.5">
+            <div className={`flex min-h-[72px] flex-1 flex-col justify-between rounded-lg border p-2 transition ${ring(s.state)}`}>
               <div className="flex items-center justify-between gap-2">
                 <span className="text-[10px] font-mono text-muted-foreground">{String(i + 1).padStart(2, "0")}</span>
                 {icon(s.state)}
               </div>
-              <p className="mt-2 text-sm font-semibold leading-tight">{s.title}</p>
-              <p className="text-[11px] leading-snug text-muted-foreground">{s.subtitle}</p>
+              <p className="mt-1 text-xs font-semibold leading-tight">{s.title}</p>
+              <p className="text-[10px] leading-snug text-muted-foreground line-clamp-2">{s.subtitle}</p>
             </div>
             {i < steps.length - 1 && <ArrowRight className="hidden size-4 shrink-0 text-muted-foreground md:block" />}
           </div>

@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { SiteHeader, SiteFooter } from "@/components/SiteHeader";
+import { BackLink } from "@/components/BackLink";
 import {
   BENEFITS,
   DAM_GEOMETRY,
@@ -13,7 +14,7 @@ import {
   STORAGE,
   TEAM,
 } from "@/lib/dam-data";
-import { FLOATING_PV } from "@/lib/floating-pv";
+import { FLOATING_PV, formatFloatingPvCapacityMwP } from "@/lib/floating-pv";
 
 export const Route = createFileRoute("/dam-profile")({
   head: () => ({
@@ -58,8 +59,11 @@ function DamProfile() {
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader />
+      <div className="mx-auto max-w-7xl px-4 pt-4 md:px-8">
+        <BackLink />
+      </div>
       <section className="bg-water text-navy-foreground">
-        <div className="mx-auto max-w-7xl px-4 py-16 md:px-8">
+        <div className="mx-auto max-w-7xl px-4 py-12 md:px-8 md:pb-16">
           <p className="text-xs uppercase tracking-[0.2em] opacity-70">AS Dam · Technical Profile</p>
           <h1 className="mt-3 text-4xl font-bold md:text-6xl">Profil Bendungan Sengkaling</h1>
           <p className="mt-4 max-w-2xl opacity-80">
@@ -178,7 +182,7 @@ function DamProfile() {
           <h2 className="text-2xl font-bold">PLTS Terapung (Floating Solar PV)</h2>
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {[
-              ["Kapasitas terpasang", `${FLOATING_PV.capacityMwP} MWp`],
+              ["Kapasitas terpasang", formatFloatingPvCapacityMwP()],
               ["Luas modul FPV", `${FLOATING_PV.areaHa} ha`],
               ["Luas permukaan waduk", `${FLOATING_PV.reservoirAreaHa} ha`],
               ["Proporsi area", `${FLOATING_PV.sharePercent}%`],

@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import {
-  LayoutDashboard, Activity, Radio, BrainCircuit, CloudRain, Sun, Sprout, ShieldCheck, FileBarChart, Settings,
+  LayoutDashboard, Activity, BrainCircuit, CloudRain, Sun, Sprout, ShieldCheck, FileBarChart, Settings,
   Waves, Download, Search, Menu, ClipboardList, GitBranch, Zap, Send,
 } from "lucide-react";
 import {
@@ -18,6 +18,7 @@ import { DEFAULT_DAM_CONFIG } from "@/lib/dam-config";
 import { changeSimulationScenario, fmtTime, useTelemetry } from "@/lib/telemetry";
 import { SIM_SCENARIOS } from "@/lib/simulation-scenarios";
 import { MlAnalysisPanel } from "@/components/dashboard/MlAnalysisPanel";
+import { DevelopmentRoadmap } from "@/components/DevelopmentRoadmap";
 import { statusBadgeClass } from "@/lib/rule-engine";
 import { useDamSystem, useOperatorStore } from "@/hooks/useDamSystem";
 import { assessFloatingPvOps } from "@/lib/floating-pv";
@@ -26,7 +27,8 @@ import { OperationPipeline } from "@/components/dashboard/OperationPipeline";
 import { OperatorBriefingCard } from "@/components/dashboard/OperatorBriefingCard";
 import { FloatingPvPanel, FloatingPvCompact } from "@/components/dashboard/FloatingPvPanel";
 import { OverviewStatusHero } from "@/components/dashboard/OverviewStatusHero";
-import { SENGKALING_ASSET, SENGKALING_DATA_STACK, SENGKALING_LEVELS_GUIDE } from "@/lib/sengkaling-monitoring";
+import { SENGKALING_ASSET, SENGKALING_LEVELS_GUIDE } from "@/lib/sengkaling-monitoring";
+import { BackLink } from "@/components/BackLink";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
@@ -43,12 +45,11 @@ export const Route = createFileRoute("/dashboard")({
 const NAV = [
   { k: "overview", l: "Ringkasan", i: LayoutDashboard },
   { k: "flow", l: "Alur Sistem", i: GitBranch },
-  { k: "live", l: "Monitoring Live", i: Activity },
-  { k: "sensors", l: "Sensor & IoT", i: Radio },
+  { k: "live", l: "Monitoring", i: Activity },
   { k: "ml", l: "Prediksi ML", i: BrainCircuit },
   { k: "fews", l: "FEWS", i: CloudRain },
   { k: "dews", l: "DEWS", i: Sun },
-  { k: "fpv", l: "Floating PV", i: Zap },
+  { k: "fpv", l: "PLTS Terapung", i: Zap },
   { k: "kirim", l: "Kirim Instruksi", i: Send },
   { k: "operator", l: "Operator Center", i: ClipboardList },
   { k: "irrigation", l: "Distribusi Air", i: Sprout },
@@ -92,20 +93,20 @@ function Dashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-emerald-50/80 via-background to-sky-50/50 text-foreground">
       <div className="flex">
-        <aside className={`fixed inset-y-0 left-0 z-50 w-64 border-r border-emerald-100 bg-white shadow-sm transition-transform md:sticky md:top-0 md:h-screen md:translate-x-0 ${open ? "translate-x-0" : "-translate-x-full"}`}>
-          <Link to="/" className="flex items-center gap-2 border-b border-sidebar-border px-5 py-5">
+        <aside className={`fixed inset-y-0 left-0 z-50 w-56 border-r border-emerald-100 bg-white shadow-sm transition-transform md:sticky md:top-0 md:h-screen md:translate-x-0 ${open ? "translate-x-0" : "-translate-x-full"}`}>
+          <Link to="/" className="flex items-center gap-2 border-b border-sidebar-border px-4 py-3">
             <span className="grid size-9 place-items-center rounded-lg bg-water"><Waves className="size-5 text-navy-foreground" /></span>
             <span className="leading-tight text-sidebar-foreground">
               <span className="block font-display text-sm font-bold">SENGKALING</span>
               <span className="block text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Ops Center</span>
             </span>
           </Link>
-          <nav className="space-y-1 p-3">
+          <nav className="space-y-0.5 p-2">
             {NAV.map((n) => (
               <button
                 key={n.k}
                 onClick={() => { setTab(n.k); setOpen(false); }}
-                className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors ${tab === n.k ? "bg-sidebar-accent text-sidebar-primary" : "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-foreground"}`}
+                className={`flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-xs transition-colors ${tab === n.k ? "bg-sidebar-accent text-sidebar-primary font-medium" : "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-foreground"}`}
               >
                 <n.i className="size-4" />{n.l}
               </button>
@@ -119,9 +120,10 @@ function Dashboard() {
         {open && <div className="fixed inset-0 z-40 bg-background/70 md:hidden" onClick={() => setOpen(false)} />}
 
         <main className="min-w-0 flex-1">
-          <header className="sticky top-0 z-30 flex flex-wrap items-center gap-3 border-b border-emerald-100 bg-white/95 px-4 py-3 shadow-sm backdrop-blur md:px-8">
+          <header className="sticky top-0 z-30 flex flex-wrap items-center gap-2 border-b border-emerald-100 bg-white/95 px-3 py-2 shadow-sm backdrop-blur md:px-5">
             <button className="md:hidden" onClick={() => setOpen(true)} aria-label="Menu"><Menu className="size-5" /></button>
-            <h1 className="font-display text-lg font-semibold">{NAV.find((n) => n.k === tab)?.l}</h1>
+            <BackLink label="Beranda" />
+            <h1 className="font-display text-base font-semibold">{NAV.find((n) => n.k === tab)?.l}</h1>
             <span className="rounded-full bg-warning/20 px-2.5 py-1 text-[11px] font-semibold text-warning">SIMULASI · DEMO</span>
             {!dataOk && <span className="rounded-full bg-destructive/20 px-2.5 py-1 text-[11px] font-semibold text-destructive">DATA TIDAK VALID</span>}
             <div className="ml-auto flex items-center gap-4 text-xs text-muted-foreground">
@@ -136,72 +138,52 @@ function Dashboard() {
             </div>
           </header>
 
-          <div className="space-y-6 p-4 md:p-8">
+          <div className="space-y-4 p-3 md:p-5">
             {tab === "overview" && (
               <>
                 <OverviewStatusHero fews={rules.fews} dews={rules.dews} dataOk={dataOk} level={current?.level} />
-                <OperatorBriefingCard briefing={briefing} dispatch={operatorDispatch} onOpenOperator={() => setTab("operator")} />
-                <OperationPipeline steps={pipelineSteps} />
-                <div className="grid gap-4 lg:grid-cols-[1fr_280px]">
-                  <Panel title="Permintaan ke Operator BU">
-                    {rules.recommendations.length === 0 && (
-                      <>
-                        <p className="text-sm text-muted-foreground">Tidak ada alarm aktif. Pemantauan rutin:</p>
-                        <div className="mt-3">
-                          <OperatorRequestLists payload={operatorDispatch} />
-                        </div>
-                      </>
+                <div className="grid gap-3 lg:grid-cols-[1fr_220px]">
+                  <div className="min-w-0 space-y-3">
+                    <OperatorBriefingCard briefing={briefing} dispatch={operatorDispatch} onOpenOperator={() => setTab("operator")} />
+                    {rules.recommendations.length > 0 && (
+                      <Panel title="Detail alarm FEWS/DEWS">
+                        <ul className="space-y-3">
+                          {rules.recommendations.map((r) => {
+                            const tasks = operatorTasksForRecommendation(r, rules.fews, rules.dews);
+                            return (
+                              <li key={r.id} className="rounded-lg border border-emerald-100 px-3 py-3 text-sm">
+                                <p className="font-semibold text-primary">{r.title}</p>
+                                <p className="mt-1 text-muted-foreground">{tasks.ringkasan}</p>
+                                <div className="mt-2">
+                                  <OperatorRequestLists payload={tasks} compact />
+                                </div>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      </Panel>
                     )}
-                    <ul className="space-y-4">
-                      {rules.recommendations.map((r) => {
-                        const tasks = operatorTasksForRecommendation(r, rules.fews, rules.dews);
-                        return (
-                          <li key={r.id} className="rounded-xl border border-emerald-100 bg-white px-4 py-4 text-sm shadow-sm">
-                            <p className="font-semibold text-primary">{r.title}</p>
-                            <p className="mt-1 text-muted-foreground">{tasks.ringkasan}</p>
-                            <div className="mt-3">
-                              <OperatorRequestLists payload={tasks} compact />
-                            </div>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  </Panel>
+                  </div>
                   <FloatingPvCompact ops={fpvOps} onClick={() => setTab("fpv")} />
                 </div>
               </>
             )}
             {tab === "flow" && (
-              <div className="space-y-6">
+              <div className="space-y-4">
                 <OperationPipeline steps={pipelineSteps} />
-                <Panel title={`Integrasi IoT · ADAS · ML · FEWS/DEWS — ${SENGKALING_ASSET.code}`}>
-                  <p className="text-sm text-muted-foreground">{SENGKALING_ASSET.name} · {SENGKALING_ASSET.location}</p>
-                  <div className="mt-4 grid gap-4 md:grid-cols-2">
-                    {SENGKALING_DATA_STACK.map((row) => (
-                      <div key={row.key} className="rounded-xl bg-muted/50 p-4">
-                        <p className="font-semibold">{row.title}</p>
-                        <p className="mt-2 text-sm text-muted-foreground">{row.detail}</p>
-                      </div>
-                    ))}
-                  </div>
-                  <p className="mt-4 text-xs text-muted-foreground">
-                    Notifikasi & workflow ke {SENGKALING_ASSET.operatorBu}. Instruksi WTC lewat tab Kirim Instruksi. Tanpa kendali aktuator otomatis.
-                  </p>
-                </Panel>
-                <OperatorBriefingCard briefing={briefing} dispatch={operatorDispatch} onOpenOperator={() => setTab("operator")} />
+                <DevelopmentRoadmap compact />
               </div>
             )}
             {tab === "live" && (
               <>
-                <OverviewStatusHero fews={rules.fews} dews={rules.dews} dataOk={dataOk} level={current?.level} />
                 <Kpis r={current} storage={storage} max={maxStorage} fews={rules.fews} dews={rules.dews} dhdt={dhdt} />
-                <div className="grid gap-6 xl:grid-cols-[1fr_340px]">
+                <div className="grid gap-4 xl:grid-cols-[1fr_280px]">
                   <Panel title="Time Series" right={
                     <div className="flex gap-1">{PERIODS.map((p) => (
                       <button key={p.l} onClick={() => setHours(p.h)} className={`rounded-md px-2.5 py-1 text-xs ${hours === p.h ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>{p.l}</button>
                     ))}</div>
                   }>
-                    <div className="h-80">
+                    <div className="h-64">
                       <ResponsiveContainer>
                         <LineChart data={chart}>
                           <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
@@ -232,7 +214,6 @@ function Dashboard() {
               </>
             )}
             {tab === "fpv" && <FloatingPvPanel ops={fpvOps} level={current?.level} />}
-            {tab === "sensors" && <SensorTable sensors={validation.sensors} messages={validation.messages} />}
             {tab === "ml" && <MlAnalysisPanel data={data} dataOk={dataOk} forecast={forecast} ml={ml} />}
             {tab === "fews" && <FewsPanel r={current} rules={rules} forecast={forecast} dataOk={dataOk} />}
             {tab === "dews" && <DewsPanel r={current} rules={rules} storage={storage} dataOk={dataOk} />}
@@ -296,9 +277,9 @@ function Dashboard() {
 
 function Panel({ title, right, children }: { title: string; right?: React.ReactNode; children: React.ReactNode }) {
   return (
-    <section className="rounded-xl border border-emerald-100/80 bg-white p-5 shadow-card">
-      <div className="mb-4 flex items-center justify-between gap-3">
-        <h2 className="font-display text-base font-semibold">{title}</h2>{right}
+    <section className="rounded-lg border border-emerald-100/80 bg-white p-3 shadow-sm md:p-4">
+      <div className="mb-3 flex items-center justify-between gap-2">
+        <h2 className="font-display text-sm font-semibold">{title}</h2>{right}
       </div>
       {children}
     </section>
@@ -328,9 +309,9 @@ function Kpis({
   return (
     <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
       {items.map((k) => (
-        <div key={k.l} className="rounded-xl border border-emerald-100 bg-white p-4 shadow-sm">
-          <p className="text-xs uppercase tracking-wider text-muted-foreground">{k.l}</p>
-          <p className={`mt-2 font-display text-2xl font-bold ${k.cls ?? ""}`}>{k.v}</p>
+        <div key={k.l} className="rounded-lg border border-emerald-100 bg-white p-3 shadow-sm">
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{k.l}</p>
+          <p className={`mt-1 font-display text-xl font-bold ${k.cls ?? ""}`}>{k.v}</p>
           <p className="text-xs text-muted-foreground">{k.u}</p>
         </div>
       ))}

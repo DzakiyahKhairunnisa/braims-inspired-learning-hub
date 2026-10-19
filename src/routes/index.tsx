@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Cpu, Database, Radio, Activity, BrainCircuit, Siren, UserCheck, Gauge } from "lucide-react";
 import hero from "@/assets/dam-hero.jpg";
 import { SiteHeader, SiteFooter } from "@/components/SiteHeader";
+import { DevelopmentRoadmap } from "@/components/DevelopmentRoadmap";
 import { BENEFITS, LEVELS, LOCATION, STORAGE, TEAM } from "@/lib/dam-data";
 import { useTelemetry } from "@/lib/telemetry";
 
@@ -135,6 +136,12 @@ function Index() {
           ))}
         </div>
         <p className="mt-4 text-xs text-muted-foreground">Tampungan maksimum rancangan: {(STORAGE.max / 1e6).toFixed(2)} jt m³.</p>
+      </section>
+
+      <section className="border-t border-border bg-muted/30">
+        <div className="mx-auto max-w-7xl px-4 py-16 md:px-8">
+          <DevelopmentRoadmap />
+        </div>
       </section>
       <SiteFooter />
     </div>

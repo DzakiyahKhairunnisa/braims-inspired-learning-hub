@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { X } from "lucide-react";
 import { SiteHeader, SiteFooter } from "@/components/SiteHeader";
+import { BackLink } from "@/components/BackLink";
 
 export const Route = createFileRoute("/gallery")({
   head: () => ({
@@ -31,7 +32,10 @@ function GalleryPage() {
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader />
-      <section className="mx-auto grid max-w-7xl gap-2 px-2 py-8 sm:grid-cols-2 lg:grid-cols-3 md:px-4">
+      <div className="mx-auto max-w-7xl px-4 pt-4 md:px-8">
+        <BackLink />
+      </div>
+      <section className="mx-auto grid max-w-7xl gap-2 px-2 py-4 sm:grid-cols-2 lg:grid-cols-3 md:px-4">
         {GALLERY.map((src) => (
           <button
             key={src}

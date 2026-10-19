@@ -47,11 +47,11 @@ export function OverviewStatusHero({
   ];
 
   return (
-    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+    <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
       {cards.map((c) => (
         <div
           key={c.title}
-          className="relative overflow-hidden rounded-2xl border border-emerald-100 bg-white p-4 shadow-card transition hover:shadow-md"
+          className="relative overflow-hidden rounded-lg border border-emerald-100 bg-white p-3 shadow-sm"
         >
           <div className="flex items-start justify-between">
             <c.icon className="size-5 text-primary" />

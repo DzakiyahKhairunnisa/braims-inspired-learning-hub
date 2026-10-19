@@ -3,6 +3,7 @@ import type { DewsStatus, FewsStatus } from "./rule-engine";
 
 /** Data rancangan PLTS Terapung — proposal LRBN SENGKALING-64. */
 export const FLOATING_PV = {
+  /** Kapasitas terpasang rancangan (proposal LRBN SENGKALING-64). */
   capacityMwP: 44.93,
   areaHa: RESERVOIR.fpvAreaHa,
   reservoirAreaHa: RESERVOIR.surfaceAreaHa,
@@ -15,6 +16,11 @@ export const FLOATING_PV = {
     "Saat kondisi hidrologi atau instrumen kritis tidak valid, produksi dapat dikurangi atau dihentikan sementara (simulasi).",
   ],
 } as const;
+
+/** Tampilan kapasitas PLTS (format Indonesia: 44,93 MWp). */
+export function formatFloatingPvCapacityMwP(): string {
+  return `${FLOATING_PV.capacityMwP.toLocaleString("id-ID", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} MWp`;
+}
 
 export type FpvOpsStatus = "produksi" | "pantau" | "kurangi" | "henti_sementara";
 

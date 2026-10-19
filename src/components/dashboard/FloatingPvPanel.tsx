@@ -1,5 +1,5 @@
 import { Sun, Waves, Zap } from "lucide-react";
-import { FLOATING_PV, type FpvOpsView } from "@/lib/floating-pv";
+import { FLOATING_PV, formatFloatingPvCapacityMwP, type FpvOpsView } from "@/lib/floating-pv";
 import { INTAKE } from "@/lib/dam-data";
 
 const statusColor: Record<FpvOpsView["status"], string> = {
@@ -23,7 +23,7 @@ export function FloatingPvPanel({ ops, level }: { ops: FpvOpsView; level?: numbe
               <Sun className="size-4 text-amber-500" />
               PLTS Terapung (FPV)
             </p>
-            <h2 className="mt-2 font-display text-2xl font-bold md:text-3xl">{FLOATING_PV.capacityMwP} MWp</h2>
+            <h2 className="mt-2 font-display text-2xl font-bold md:text-3xl">{formatFloatingPvCapacityMwP()}</h2>
             <p className="mt-1 text-sm text-muted-foreground">
               {FLOATING_PV.areaHa} ha · {FLOATING_PV.sharePercent}% dari luas waduk {FLOATING_PV.reservoirAreaHa} ha
             </p>
@@ -97,8 +97,8 @@ export function FloatingPvCompact({ ops, onClick }: { ops: FpvOpsView; onClick?:
       className="group flex w-full items-center justify-between rounded-xl border border-amber-500/30 bg-gradient-to-r from-amber-500/10 to-sky-500/10 p-4 text-left transition hover:border-amber-500/50"
     >
       <div>
-        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Floating PV</p>
-        <p className="mt-1 font-display text-lg font-bold">{FLOATING_PV.capacityMwP} MWp</p>
+        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">PLTS terapung</p>
+        <p className="mt-1 font-display text-lg font-bold">{formatFloatingPvCapacityMwP()}</p>
         <p className={`text-sm font-medium ${statusColor[ops.status]}`}>{ops.label}</p>
       </div>
       <p className="font-mono text-2xl font-bold text-amber-600 group-hover:scale-105 transition">{ops.outputMw.toFixed(0)}<span className="text-sm"> MW</span></p>

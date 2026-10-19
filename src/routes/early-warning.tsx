@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { CloudRain, Sun, Waves, ShieldAlert } from "lucide-react";
 import { SiteHeader, SiteFooter } from "@/components/SiteHeader";
+import { BackLink } from "@/components/BackLink";
 import { LEVELS } from "@/lib/dam-data";
 import { SENGKALING_ASSET } from "@/lib/sengkaling-monitoring";
 
@@ -27,8 +28,9 @@ function EarlyWarning() {
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader />
-      <section className="mx-auto max-w-7xl px-4 py-16 md:px-8">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">Early Warning</p>
+      <section className="mx-auto max-w-7xl px-4 py-8 md:px-8 md:py-12">
+        <BackLink />
+        <p className="mt-4 text-xs font-semibold uppercase tracking-[0.2em] text-primary">Early Warning</p>
         <h1 className="mt-2 text-4xl font-bold md:text-5xl">FEWS & DEWS</h1>
         <p className="mt-4 max-w-2xl text-muted-foreground">
           {SENGKALING_ASSET.name} ({SENGKALING_ASSET.location}): FEWS aktif dari elevasi +{LEVELS.FEWS} m dengan ruang tampungan hingga HWL +{LEVELS.HWL} m; DEWS mengawasi penurunan menuju LWL +{LEVELS.LWL} m.

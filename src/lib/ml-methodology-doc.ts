@@ -105,7 +105,10 @@ export const ML_METHODOLOGY_SECTIONS: MethodologySection[] = [
   },
   {
     id: "roadmap",
-    title: "5. Pengembangan ke model yang lebih “real”",
+    title: "5. Pengembangan ke model yang lebih “real” (menuju digital twin)",
+    paragraphs: [
+      "Digital twin bendungan diposisikan sebagai visi Tahap 4 pada halaman beranda dan tab Alur Sistem — bukan klaim fitur demonstrasi saat ini.",
+    ],
     bullets: [
       "Routing waduk: integrasikan dV/dt dengan kurva f(Z) proposal dan luas permukaan A_s(Z).",
       "Hujan–aliran: kalibrasi model DAS hulu Sengkaling untuk memprediksi Q_in, bukan hanya β_P heuristik.",
