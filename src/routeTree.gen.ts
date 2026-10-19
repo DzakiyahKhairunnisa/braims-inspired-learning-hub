@@ -10,33 +10,53 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DamProfileRouteImport } from './routes/dam-profile'
+import { Route as EarlyWarningRouteImport } from './routes/early-warning'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DamProfileRoute = DamProfileRouteImport.update({
+  id: '/dam-profile',
+  path: '/dam-profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EarlyWarningRoute = EarlyWarningRouteImport.update({
+  id: '/early-warning',
+  path: '/early-warning',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/dam-profile': typeof DamProfileRoute
+  '/early-warning': typeof EarlyWarningRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/dam-profile': typeof DamProfileRoute
+  '/early-warning': typeof EarlyWarningRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/dam-profile': typeof DamProfileRoute
+  '/early-warning': typeof EarlyWarningRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/dam-profile' | '/early-warning'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/dam-profile' | '/early-warning'
+  id: '__root__' | '/' | '/dam-profile' | '/early-warning'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DamProfileRoute: typeof DamProfileRoute
+  EarlyWarningRoute: typeof EarlyWarningRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +68,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dam-profile': {
+      id: '/dam-profile'
+      path: '/dam-profile'
+      fullPath: '/dam-profile'
+      preLoaderRoute: typeof DamProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/early-warning': {
+      id: '/early-warning'
+      path: '/early-warning'
+      fullPath: '/early-warning'
+      preLoaderRoute: typeof EarlyWarningRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DamProfileRoute: DamProfileRoute,
+  EarlyWarningRoute: EarlyWarningRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
