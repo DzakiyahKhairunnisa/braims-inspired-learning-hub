@@ -42,12 +42,33 @@ function EarlyWarning() {
             </div>
           ))}
         </div>
-        <div className="mt-12 rounded-xl bg-water p-8 text-navy-foreground">
-          <p className="font-mono text-sm opacity-80">DEWS → Konservasi Air → NWL → FEWS → Controlled Release → Spillway</p>
+        <div className="mt-12 rounded-xl border border-border bg-card p-8">
+          <h2 className="text-xl font-bold">Bagaimana data sampai ke Operator Utama?</h2>
+          <ol className="mt-4 grid gap-3 text-sm text-muted-foreground md:grid-cols-2">
+            {[
+              "Sensor lapangan (muka air, hujan, debit, keamanan struktur) mengirim pembacaan ke ADAS.",
+              "ADAS memvalidasi kelengkapan dan kewajaran data; sensor bermasalah ditandai.",
+              "Gateway IoT menyalurkan data ke basis data terpusat.",
+              "Modul prediksi membantu memperkirakan tren muka air (demo di dashboard).",
+              "FEWS dan DEWS menilai risiko banjir/kekeringan dan menyusun rekomendasi.",
+              "Notifikasi masuk ke Operator Utama; keputusan disetujui/ditolak dan tercatat — tanpa kendali pintu otomatis.",
+            ].map((s, i) => (
+              <li key={s} className="flex gap-3 rounded-lg bg-muted/50 p-3">
+                <span className="font-mono text-xs text-primary">{i + 1}</span>
+                <span>{s}</span>
+              </li>
+            ))}
+          </ol>
+        </div>
+        <div className="mt-8 rounded-xl bg-water p-8 text-navy-foreground">
+          <p className="font-mono text-sm opacity-80">DEWS → Konservasi Air → NWL → FEWS → Pelepasan terkendali → Spillway</p>
           <p className="mt-3 max-w-3xl text-sm opacity-80">
-            Ruang tampungan antara +113 m dan +123 m menjadi flood cushion. Operator tetap memiliki manual override.
+            Ruang tampungan antara +113 m dan +123 m menjadi flood cushion. Operator Utama memiliki kendali penuh atas tindakan lapangan.
           </p>
-          <Link to="/dashboard" className="mt-6 inline-block rounded-lg bg-accent px-5 py-3 font-medium text-accent-foreground">Lihat di Dashboard</Link>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Link to="/dashboard" className="inline-block rounded-lg bg-accent px-5 py-3 font-medium text-accent-foreground">Buka Dashboard</Link>
+            <Link to="/dashboard" search={{}} className="inline-block rounded-lg border border-navy-foreground/30 px-5 py-3 text-sm font-medium">Tab Alur Sistem & Floating PV</Link>
+          </div>
         </div>
       </section>
       <SiteFooter />

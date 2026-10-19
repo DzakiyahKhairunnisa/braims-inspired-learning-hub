@@ -38,6 +38,7 @@ export function NotificationBell({
                 <p className="mt-1 text-muted-foreground">{fmtDateTime(n.at)} · {n.status}</p>
                 <p className="mt-2">{n.body}</p>
                 <p className="mt-2 text-muted-foreground">Rekomendasi: {n.recommendation}</p>
+                <p className="mt-1 text-[10px] text-primary">Penerima: {n.recipient}</p>
                 <p className="mt-1 font-mono text-[10px]">{n.parameters}</p>
               </li>
             ))}

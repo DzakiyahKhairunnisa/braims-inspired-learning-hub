@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import {
   LayoutDashboard, Activity, Radio, BrainCircuit, CloudRain, Sun, Sprout, ShieldCheck, FileBarChart, Settings,
-  Waves, Download, Search, Menu, ClipboardList,
+  Waves, Download, Search, Menu, ClipboardList, GitBranch, Zap,
 } from "lucide-react";
 import {
   Area, AreaChart, CartesianGrid, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis, Legend,
@@ -17,6 +17,12 @@ import { SIM_SCENARIOS } from "@/lib/simulation-scenarios";
 import { ML_DEMO_LABEL } from "@/lib/ml-engine";
 import { statusBadgeClass } from "@/lib/rule-engine";
 import { useDamSystem, useOperatorStore } from "@/hooks/useDamSystem";
+import { assessFloatingPvOps } from "@/lib/floating-pv";
+import { buildOperatorBriefing, buildPipelineSteps } from "@/lib/operation-pipeline";
+import { OperationPipeline } from "@/components/dashboard/OperationPipeline";
+import { OperatorBriefingCard } from "@/components/dashboard/OperatorBriefingCard";
+import { FloatingPvPanel, FloatingPvCompact } from "@/components/dashboard/FloatingPvPanel";
+import { OverviewStatusHero } from "@/components/dashboard/OverviewStatusHero";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
@@ -31,15 +37,17 @@ export const Route = createFileRoute("/dashboard")({
 });
 
 const NAV = [
-  { k: "overview", l: "Overview", i: LayoutDashboard },
-  { k: "live", l: "Live Monitoring", i: Activity },
+  { k: "overview", l: "Ringkasan", i: LayoutDashboard },
+  { k: "flow", l: "Alur Sistem", i: GitBranch },
+  { k: "live", l: "Monitoring Live", i: Activity },
   { k: "sensors", l: "Sensor & IoT", i: Radio },
-  { k: "ml", l: "ML Prediction", i: BrainCircuit },
+  { k: "ml", l: "Prediksi ML", i: BrainCircuit },
   { k: "fews", l: "FEWS", i: CloudRain },
   { k: "dews", l: "DEWS", i: Sun },
+  { k: "fpv", l: "Floating PV", i: Zap },
   { k: "operator", l: "Operator Center", i: ClipboardList },
   { k: "irrigation", l: "Distribusi Air", i: Sprout },
-  { k: "safety", l: "Dam Safety / RTD", i: ShieldCheck },
+  { k: "safety", l: "Keselamatan / RTD", i: ShieldCheck },
   { k: "reports", l: "Histori & Audit", i: FileBarChart },
   { k: "settings", l: "Konfigurasi", i: Settings },
 ] as const;
@@ -63,6 +71,18 @@ function Dashboard() {
   const operatorState = useOperatorStore();
   const chart = useMemo(() => data.map((d) => ({ ...d, time: fmtTime(d.t) })), [data]);
   const dataOk = validation.dataValid;
+  const fpvOps = useMemo(
+    () => assessFloatingPvOps(current?.level, rules.fews, rules.dews, dataOk),
+    [current?.level, rules.fews, rules.dews, dataOk],
+  );
+  const pipelineSteps = useMemo(
+    () => buildPipelineSteps(validation, rules, operatorState.items.some((i) => i.workflowStatus === "baru")),
+    [validation, rules, operatorState.items],
+  );
+  const briefing = useMemo(
+    () => buildOperatorBriefing(validation, rules, rules.recommendations),
+    [validation, rules],
+  );
 
   return (
     <div className="dark min-h-screen bg-background text-foreground">
@@ -112,9 +132,55 @@ function Dashboard() {
           </header>
 
           <div className="space-y-6 p-4 md:p-8">
-            {(tab === "overview" || tab === "live") && (
+            {tab === "overview" && (
               <>
-                <StatusRow fews={rules.fews} dews={rules.dews} dataOk={dataOk} />
+                <OverviewStatusHero fews={rules.fews} dews={rules.dews} dataOk={dataOk} level={current?.level} />
+                <OperatorBriefingCard briefing={briefing} onOpenOperator={() => setTab("operator")} />
+                <OperationPipeline steps={pipelineSteps} />
+                <div className="grid gap-4 lg:grid-cols-[1fr_280px]">
+                  <Panel title="Rekomendasi terbaru">
+                    {rules.recommendations.length === 0 && (
+                      <p className="text-sm text-muted-foreground">Tidak ada rekomendasi aktif — kondisi dalam rentang normal.</p>
+                    )}
+                    <ul className="space-y-3">
+                      {rules.recommendations.map((r) => (
+                        <li key={r.id} className="rounded-lg border border-border bg-muted/40 px-4 py-3 text-sm">
+                          <p className="font-semibold">{r.title}</p>
+                          <p className="mt-1 text-muted-foreground">{r.recommendedAction}</p>
+                        </li>
+                      ))}
+                    </ul>
+                  </Panel>
+                  <FloatingPvCompact ops={fpvOps} onClick={() => setTab("fpv")} />
+                </div>
+              </>
+            )}
+            {tab === "flow" && (
+              <div className="space-y-6">
+                <OperationPipeline steps={pipelineSteps} />
+                <Panel title="Peran tiap lapisan (ringkas)">
+                  <div className="grid gap-4 md:grid-cols-2">
+                    {[
+                      ["Sensor & ADAS", "Mengambil dan memvalidasi muka air, hujan, debit, serta instrumen keamanan. Data rusak tidak dipakai untuk rekomendasi otomatis."],
+                      ["IoT & basis data", "Menyimpan deret waktu dan status koneksi gateway. Frekuensi akuisisi dapat dinaikkan saat FEWS/DEWS aktif (konfigurasi)."],
+                      ["Prediksi", "Memberi gambaran tren 1–24 jam ke depan (model demo). Membantu operator, bukan pengganti inspeksi lapangan."],
+                      ["FEWS / DEWS", "Menggabungkan pengukuran, tren, dan prediksi untuk status WASPADA–SIAGA–KRITIS serta rekomendasi operasi waduk."],
+                      ["Notifikasi", "Setiap perubahan status penting dikirim ke Operator Utama di dashboard (simulasi; integrasi SMS/email opsional)."],
+                      ["Operator", "Menyetujui, menolak, atau menandai tindakan — tercatat di audit log. Tidak ada perintah langsung ke pintu/outlet nyata."],
+                    ].map(([t, d]) => (
+                      <div key={t} className="rounded-xl bg-muted/50 p-4">
+                        <p className="font-semibold">{t}</p>
+                        <p className="mt-2 text-sm text-muted-foreground">{d}</p>
+                      </div>
+                    ))}
+                  </div>
+                </Panel>
+                <OperatorBriefingCard briefing={briefing} onOpenOperator={() => setTab("operator")} />
+              </div>
+            )}
+            {tab === "live" && (
+              <>
+                <OverviewStatusHero fews={rules.fews} dews={rules.dews} dataOk={dataOk} level={current?.level} />
                 <Kpis r={current} storage={storage} max={maxStorage} fews={rules.fews} dews={rules.dews} dhdt={dhdt} />
                 <div className="grid gap-6 xl:grid-cols-[1fr_340px]">
                   <Panel title="Time Series" right={
@@ -151,6 +217,7 @@ function Dashboard() {
                 <SensorTable sensors={validation.sensors} messages={validation.messages} />
               </>
             )}
+            {tab === "fpv" && <FloatingPvPanel ops={fpvOps} level={current?.level} />}
             {tab === "sensors" && <SensorTable sensors={validation.sensors} messages={validation.messages} />}
             {tab === "ml" && <MlPanel forecast={forecast} ml={ml} />}
             {tab === "fews" && <FewsPanel r={current} rules={rules} forecast={forecast} dataOk={dataOk} />}
@@ -220,18 +287,6 @@ function Panel({ title, right, children }: { title: string; right?: React.ReactN
       </div>
       {children}
     </section>
-  );
-}
-
-function StatusRow({ fews, dews, dataOk }: { fews: string; dews: string; dataOk: boolean }) {
-  return (
-    <div className="flex flex-wrap gap-3">
-      <span className={`rounded-full px-3 py-1 text-xs font-bold ${statusBadgeClass(fews as "NORMAL")}`}>FEWS: {fews}</span>
-      <span className={`rounded-full px-3 py-1 text-xs font-bold ${statusBadgeClass(dews as "NORMAL")}`}>DEWS: {dews}</span>
-      <span className={`rounded-full px-3 py-1 text-xs font-bold ${dataOk ? "bg-success/20 text-success" : "bg-destructive/20 text-destructive"}`}>
-        Data: {dataOk ? "Valid" : "Tidak valid"}
-      </span>
-    </div>
   );
 }
 

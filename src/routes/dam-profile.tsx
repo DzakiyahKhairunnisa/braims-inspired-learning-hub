@@ -15,6 +15,8 @@ import {
   STORAGE,
   TEAM,
 } from "@/lib/dam-data";
+import { FLOATING_PV } from "@/lib/floating-pv";
+import { Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/dam-profile")({
   head: () => ({
@@ -152,6 +154,34 @@ function DamProfile() {
               <Bar dataKey="q" name="Q (m³/det)" fill="var(--chart-1)" radius={[6, 6, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
+        </div>
+      </section>
+
+      <section className="border-y border-border bg-gradient-to-br from-amber-500/10 via-background to-sky-500/10">
+        <div className="mx-auto max-w-7xl px-4 py-16 md:px-8">
+          <h2 className="text-2xl font-bold">PLTS Terapung (Floating Solar PV)</h2>
+          <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+            Pemanfaatan energi terbarukan di permukaan waduk sesuai rancangan — terintegrasi dengan operasi bendungan dan dipantau dari dashboard.
+          </p>
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              ["Kapasitas terpasang", `${FLOATING_PV.capacityMwP} MWp`],
+              ["Luas modul FPV", `${FLOATING_PV.areaHa} ha`],
+              ["Luas permukaan waduk", `${FLOATING_PV.reservoirAreaHa} ha`],
+              ["Proporsi area", `${FLOATING_PV.sharePercent}%`],
+            ].map(([l, v]) => (
+              <div key={l} className="rounded-xl border border-border bg-card p-5">
+                <p className="text-sm text-muted-foreground">{l}</p>
+                <p className="mt-2 font-display text-2xl font-bold text-primary">{v}</p>
+              </div>
+            ))}
+          </div>
+          <p className="mt-6 text-sm text-muted-foreground">
+            PLTA rancangan ±{FLOATING_PV.hydroMw} MW melengkapi skema energi hibrida. Status operasi FPV mengikuti kondisi muka air dan peringatan FEWS/DEWS di pusat kontrol.
+          </p>
+          <Link to="/dashboard" className="mt-4 inline-block text-sm font-medium text-primary hover:underline">
+            Lihat panel Floating PV di dashboard operasi →
+          </Link>
         </div>
       </section>
 
